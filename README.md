@@ -1,2 +1,3 @@
-# pagespeed_exporter
+# Pagespeed Exporter
+
 Prometheus pagespeed exporter
