@@ -1,9 +1,16 @@
-sudo: false
-
 language: go
-
 go:
   - 1.8.x
 
+sudo: required
+
+services:
+  - docker
+
 script:
   - make
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+      make docker-build ;
+    fi;
