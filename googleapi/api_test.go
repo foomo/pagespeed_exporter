@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"github.com/stretchr/testify/assert"
 	"bytes"
+	"net/http"
+	"net/http/httptest"
 )
 
 func TestParseResultFromData(t *testing.T) {
@@ -52,4 +54,37 @@ func TestParseResultFromReader(t *testing.T) {
 	}
 
 	assert.Equal(t, resultData, readerData)
+}
+
+func TestNewGoogleAPIService(t *testing.T) {
+	service := NewGoogleAPIService("api-key")
+	assert.Equal(t, "api-key", service.(Service).apiKey)
+}
+
+func TestGetPagespeedResults(t *testing.T) {
+	http.DefaultClient.Transport = &mockTransport{}
+
+	service := NewGoogleAPIService("api-key")
+	result, errResult := service.GetPagespeedResults("target")
+	if errResult != nil {
+		t.Error(errResult)
+	}
+	assert.NotNil(t, result)
+}
+
+type mockTransport struct {
+	http.RoundTripper
+}
+
+func (lt mockTransport) RoundTrip(r *http.Request) (res *http.Response, err error) {
+
+	data, err := ioutil.ReadFile("testdata/exampleresult.json")
+	if err != nil {
+		return nil, err
+	}
+
+	response := httptest.ResponseRecorder{}
+	response.Body = bytes.NewBuffer(data)
+	response.WriteHeader(200)
+	return response.Result(), nil
 }
