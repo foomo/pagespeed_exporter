@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"strings"
 	log "github.com/sirupsen/logrus"
+	"strings"
 
 	"github.com/foomo/pagespeed_exporter/collector"
 	"time"
@@ -27,7 +27,7 @@ func parseFlags() {
 	flag.StringVar(&googleApiKey, "api-key", "", "sets the google API key used for pagespeed")
 	flag.StringVar(&listenerAddress, "listener", ":8080", "sets the listener address for the exporters")
 	targetsFlag := flag.String("targets", "", "comma separated list of targets to measure")
-	intervalFlag := flag.String("interval", "30m", "check interval (e.g. 3s 4h 5d ...)")
+	intervalFlag := flag.String("interval", "1h", "check interval (e.g. 3s 4h 5d ...)")
 
 	flag.Parse()
 

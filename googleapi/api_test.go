@@ -1,12 +1,12 @@
 package googleapi
 
 import (
-	"testing"
-	"io/ioutil"
-	"github.com/stretchr/testify/assert"
 	"bytes"
+	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 )
 
 func TestParseResultFromData(t *testing.T) {

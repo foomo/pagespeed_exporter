@@ -2,11 +2,11 @@ package googleapi
 
 import (
 	"encoding/json"
-	"net/http"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"errors"
+	"net/http"
 )
 
 type Strategy string

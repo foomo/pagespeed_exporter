@@ -1,13 +1,13 @@
 package collector
 
 import (
+	"github.com/foomo/pagespeed_exporter/exporter"
+	"github.com/foomo/pagespeed_exporter/googleapi"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"time"
-	"github.com/foomo/pagespeed_exporter/googleapi"
-	"github.com/foomo/pagespeed_exporter/exporter"
 	"reflect"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"time"
 )
 
 type ResultListener func(*googleapi.Result) error

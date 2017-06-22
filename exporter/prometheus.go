@@ -1,8 +1,8 @@
 package exporter
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/foomo/pagespeed_exporter/googleapi"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
