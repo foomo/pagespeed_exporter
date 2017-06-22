@@ -65,11 +65,23 @@ func TestGetPagespeedResults(t *testing.T) {
 	http.DefaultClient.Transport = &mockTransport{}
 
 	service := NewGoogleAPIService("api-key")
-	result, errResult := service.GetPagespeedResults("target")
+	result, errResult := service.GetPagespeedResults("testdata/exampleresult.json")
 	if errResult != nil {
 		t.Error(errResult)
 	}
+
 	assert.NotNil(t, result)
+}
+
+func TestGetPagespeedResultsBadRequest(t *testing.T) {
+	http.DefaultClient.Transport = &mockTransport{}
+
+	service := NewGoogleAPIService("api-key")
+	_, errResult := service.GetPagespeedResults("nope.jpg")
+	if errResult == nil {
+		t.Error("there should be an error thrown")
+	}
+
 }
 
 type mockTransport struct {
@@ -77,14 +89,15 @@ type mockTransport struct {
 }
 
 func (lt mockTransport) RoundTrip(r *http.Request) (res *http.Response, err error) {
-
-	data, err := ioutil.ReadFile("testdata/exampleresult.json")
-	if err != nil {
-		return nil, err
-	}
-
 	response := httptest.ResponseRecorder{}
-	response.Body = bytes.NewBuffer(data)
-	response.WriteHeader(200)
+	filepath := r.URL.Query().Get("url")
+	data, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		response.Body = bytes.NewBuffer([]byte("Not found"))
+		response.WriteHeader(404)
+	} else {
+		response.Body = bytes.NewBuffer(data)
+		response.WriteHeader(200)
+	}
 	return response.Result(), nil
 }
