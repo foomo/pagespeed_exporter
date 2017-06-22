@@ -65,19 +65,20 @@ func TestGetPagespeedResults(t *testing.T) {
 	http.DefaultClient.Transport = &mockTransport{}
 
 	service := NewGoogleAPIService("api-key")
-	result, errResult := service.GetPagespeedResults("testdata/exampleresult.json")
+	result, errResult := service.GetPagespeedResults("testdata/exampleresult.json", StrategyDesktop)
 	if errResult != nil {
 		t.Error(errResult)
 	}
 
 	assert.NotNil(t, result)
+	assert.Equal(t, StrategyDesktop, result.Strategy)
 }
 
 func TestGetPagespeedResultsBadRequest(t *testing.T) {
 	http.DefaultClient.Transport = &mockTransport{}
 
 	service := NewGoogleAPIService("api-key")
-	_, errResult := service.GetPagespeedResults("nope.jpg")
+	_, errResult := service.GetPagespeedResults("nope.jpg", StrategyDesktop)
 	if errResult == nil {
 		t.Error("there should be an error thrown")
 	}

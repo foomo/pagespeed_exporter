@@ -58,13 +58,22 @@ func (e *PagespeedCollector) registerListener(listener ResultListener) {
 
 func (e *PagespeedCollector) watch() {
 	service := googleapi.NewGoogleAPIService(e.googleApiKey)
+	strategies := []googleapi.Strategy{googleapi.StrategyDesktop, googleapi.StrategyMobile}
 	for true {
 		for _, target := range e.targets {
-			res, err := service.GetPagespeedResults(target)
-			if err != nil {
-				log.WithField("target", target).Error("error occurred in pagespeed service", err)
-			} else {
-				e.resultChannel <- res
+			for _, strategy := range strategies {
+				res, err := service.GetPagespeedResults(target, strategy)
+				resultLogger := log.WithFields(log.Fields{
+					"target":   target,
+					"strategy": strategy,
+				})
+
+				if err != nil {
+					resultLogger.Error("error occurred in pagespeed service", err)
+				} else {
+					resultLogger.Infof("successfully retrieved results for target %s and strategy %s", target, strategy)
+					e.resultChannel <- res
+				}
 			}
 		}
 		time.Sleep(e.checkInterval)

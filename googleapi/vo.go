@@ -1,10 +1,12 @@
 package googleapi
 
-
 type Result struct {
 	// Id: Canonicalized and final URL for the document, after following
 	// page redirects (if any).
 	Target string `json:"id,omitempty"`
+
+	// Strategy of the test (mobile/desktop)
+	Strategy Strategy
 
 	// InvalidRules: List of rules that were specified in the request, but
 	// which the server did not know how to instantiate.

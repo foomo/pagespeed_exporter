@@ -9,12 +9,19 @@ import (
 	"errors"
 )
 
+type Strategy string
+
 const (
-	pagespeedApiTemplate = "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=%s&key=%s&prettyprint=false"
+	StrategyMobile  = Strategy("mobile")
+	StrategyDesktop = Strategy("desktop")
+)
+
+const (
+	pagespeedApiTemplate = "https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url=%s&key=%s&strategy=%s&prettyprint=false"
 )
 
 type APIService interface {
-	GetPagespeedResults(target string) (result *Result, err error)
+	GetPagespeedResults(target string, strategy Strategy) (result *Result, err error)
 }
 
 type Service struct {
@@ -26,8 +33,8 @@ func NewGoogleAPIService(apiKey string) APIService {
 		apiKey: apiKey,
 	}
 }
-func (service Service) GetPagespeedResults(target string) (result *Result, err error) {
-	requestUrl := fmt.Sprintf(pagespeedApiTemplate, target, service.apiKey)
+func (service Service) GetPagespeedResults(target string, strategy Strategy) (result *Result, err error) {
+	requestUrl := fmt.Sprintf(pagespeedApiTemplate, target, service.apiKey, strategy)
 	resp, err := http.Get(requestUrl)
 	if err != nil {
 		return nil, err
@@ -39,7 +46,11 @@ func (service Service) GetPagespeedResults(target string) (result *Result, err e
 		return nil, errors.New("Invalid response status " + resp.Status + " and body " + string(responseBody))
 	}
 
-	return ParseResultFromReader(resp.Body)
+	result, err = ParseResultFromReader(resp.Body)
+	if result != nil {
+		result.Strategy = strategy
+	}
+	return
 }
 
 func ParseResultFromReader(reader io.Reader) (result *Result, err error) {
