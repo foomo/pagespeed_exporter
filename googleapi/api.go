@@ -28,7 +28,6 @@ func NewGoogleAPIService(apiKey string) APIService {
 }
 func (service Service) GetPagespeedResults(target string) (result *Result, err error) {
 	requestUrl := fmt.Sprintf(pagespeedApiTemplate, target, service.apiKey)
-	fmt.Println(requestUrl)
 	resp, err := http.Get(requestUrl)
 	if err != nil {
 		return nil, err
