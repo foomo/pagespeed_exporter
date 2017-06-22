@@ -21,19 +21,20 @@ type PagespeedCollector struct {
 	resultListeners []ResultListener
 }
 
-func NewCollector(listenerAddress, googleApiKey string, targets []string) *PagespeedCollector {
+func NewCollector(listenerAddress, googleApiKey string, targets []string, checkInterval time.Duration) *PagespeedCollector {
 	return &PagespeedCollector{
 		listenerAddress: listenerAddress,
 		googleApiKey:    googleApiKey,
 		targets:         targets,
-		checkInterval:   30 * time.Minute,
+		checkInterval:   checkInterval,
 		resultChannel:   make(chan *googleapi.Result, 1),
 		resultListeners: []ResultListener{},
 	}
 }
 
 func (e *PagespeedCollector) Start() error {
-	log.Info("starting pagespeed exporter on listener ", e.listenerAddress, " for ", len(e.targets), " target(s)")
+	startupMessage := "starting pagespeed exporter on listener %s for %d target(s) with re-check interval of %s"
+	log.Infof(startupMessage, e.listenerAddress, len(e.targets), e.checkInterval)
 
 	s := &http.Server{
 		Addr: e.listenerAddress,
