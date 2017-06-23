@@ -12,5 +12,5 @@ script:
 
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-      make docker-build && make docker-push;
+      make docker-build && DOCKER_IMAGE_TAG=latest make docker-push;
     fi;
