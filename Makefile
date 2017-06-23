@@ -54,7 +54,7 @@ docker-build:
 docker-push:
 	@echo ">> pushing docker image"
 	@docker login -u="$(DOCKER_USERNAME)" -p="$(DOCKER_PASSWORD)"
-	@docker push foomo/petze
+	@docker push $(DOCKER_IMAGE_NAME)
 
 promu:
 	@GOARCH=amd64 GOOS=linux CGO_ENABLED=0 $(GO) get -u github.com/prometheus/promu
