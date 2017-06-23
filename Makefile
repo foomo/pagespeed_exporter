@@ -39,13 +39,9 @@ vet:
 	@echo ">> vetting code"
 	@$(GO) vet $(pkgs)
 
-build: promu glide
+build: glide
 	@echo ">> building binaries"
-	@$(PROMU) build --prefix $(PREFIX)
-
-tarball: promu
-	@echo ">> building release tarball"
-	@$(PROMU) tarball --prefix $(PREFIX) $(BIN_DIR)
+	@GOARCH=amd64 GOOS=linux CGO_ENABLED=0 $(GO) build -o pagespeed_exporter pagespeed_exporter.go
 
 docker-build:
 	@echo ">> building docker image"
@@ -55,9 +51,6 @@ docker-push:
 	@echo ">> pushing docker image"
 	@docker login -u="$(DOCKER_USERNAME)" -p="$(DOCKER_PASSWORD)"
 	@docker push $(DOCKER_IMAGE_NAME)
-
-promu:
-	@GOARCH=amd64 GOOS=linux CGO_ENABLED=0 $(GO) get -u github.com/prometheus/promu
 
 glide:
 	@go get github.com/Masterminds/glide && glide install
