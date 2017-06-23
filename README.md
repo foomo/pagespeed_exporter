@@ -1,4 +1,5 @@
 # Pagespeed Exporter
+[![Travis CI](https://travis-ci.org/foomo/pagespeed_exporter.svg?branch=master)](https://travis-ci.org/foomo/pagespeed_exporter)
 
 Prometheus exporter for google pagespeed metrics
 
