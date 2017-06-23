@@ -7,6 +7,6 @@ COPY pagespeed_exporter /bin/pagespeed_exporter
 
 RUN chmod +x /bin/pagespeed_exporter
 
-EXPOSE      8080
+EXPOSE      9271
 
 ENTRYPOINT  [ "/bin/pagespeed_exporter" ]

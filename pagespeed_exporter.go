@@ -25,7 +25,7 @@ func main() {
 
 func parseFlags() {
 	flag.StringVar(&googleApiKey, "api-key", "", "sets the google API key used for pagespeed")
-	flag.StringVar(&listenerAddress, "listener", ":8080", "sets the listener address for the exporters")
+	flag.StringVar(&listenerAddress, "listener", ":9271", "sets the listener address for the exporters")
 	targetsFlag := flag.String("targets", "", "comma separated list of targets to measure")
 	intervalFlag := flag.String("interval", "1h", "check interval (e.g. 3s 4h 5d ...)")
 
