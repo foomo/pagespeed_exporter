@@ -5,13 +5,16 @@ Prometheus exporter for google pagespeed metrics
 
 ## Building And Running
 
-## Building
+### Building
 
 ```sh
 make
 ```
 
 ### Examples 
+
+To run pagespeed exporter we need to obtain the google api key for the pagespeed. 
+Instructions how to create a key for pagespeed can be found [here](https://developers.google.com/speed/docs/insights/v2/first-app)
 
 pagespeed_exporter <arguments>
 
