@@ -59,27 +59,27 @@ var (
 	}, metricsLabels)
 
 	pageSpeedCssResourceCount = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "pagespeed_pagestats_css_resource_count",
+		Name: "pagespeed_pagestats_css_resources",
 		Help: "Number of CSS resources referenced by the page",
 	}, metricsLabels)
 
 	pageSpeedHostCount = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "pagespeed_pagestats_host_count",
+		Name: "pagespeed_pagestats_hosts",
 		Help: "Number of unique hosts referenced by the page",
 	}, metricsLabels)
 
 	pageSpeedJsResourceCount = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "pagespeed_pagestats_js_resource_count",
+		Name: "pagespeed_pagestats_js_resources",
 		Help: "Number of JavaScript resources referenced by the page",
 	}, metricsLabels)
 
 	pageSpeedHttpResourceCount = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "pagespeed_pagestats_http_resource_count",
+		Name: "pagespeed_pagestats_http_resources",
 		Help: "Number of HTTP resources loaded by the page",
 	}, metricsLabels)
 
 	pageSpeedStaticResourceCount = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "pagespeed_pagestats_static_resource_count",
+		Name: "pagespeed_pagestats_static_resources",
 		Help: " Number of static (i.e. cacheable) resources on the page",
 	}, metricsLabels)
 )
