@@ -81,7 +81,7 @@ func (e *PagespeedCollector) watch() {
 }
 
 func (e *PagespeedCollector) collect() {
-	for true {
+	for {
 		select {
 		case res := <-e.resultChannel:
 			e.handleResult(res)
