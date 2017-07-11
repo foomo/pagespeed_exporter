@@ -36,5 +36,5 @@ pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus
 ### Docker
 
 ```sh
-docker run -p "9271:9271" --rm foomo/pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus.io
+docker run -p "9271:9271" --rm foomo/pagespeed-exporter -api-key {KEY} -targets https://google.com,https://prometheus.io
 ```
