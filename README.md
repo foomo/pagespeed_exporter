@@ -23,18 +23,25 @@ pagespeed_exporter <arguments>
 pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus.io -listener :80
 ```
 
-### Exporter CLI Arguments
+### Exporter configuration
 
-| Flag      | Description                                 | Default | Required |
-|-----------|---------------------------------------------|---------|----------|
-| -api-key  | sets the google API key used for pagespeed  |         | True     |
-| -targets  | comma separated list of targets to measure  |         | True     |
-| -interval | check interval (e.g. 3s 4h 5d ...)          | 1h      | False    |
-| -listener | sets the listener address for the exporters | :9271   | False    |
+| Flag      | Variable           | Description                                 | Default | Required |
+|-----------|--------------------|---------------------------------------------|---------|----------|
+| -api-key  | PAGESPEED_API_KEY  | sets the google API key used for pagespeed  |         | True     |
+| -targets  | PAGESPEED_TARGETS  | comma separated list of targets to measure  |         | True     |
+| -interval | PAGESPEED_INTERVAL | check interval (e.g. 3s 4h 5d ...)          | 1h      | False    |
+| -listener | PAGESPEED_LISTENER | sets the listener address for the exporters | :9271   | False    |
 
 
 ### Docker
 
 ```sh
 docker run -p "9271:9271" --rm foomo/pagespeed-exporter -api-key {KEY} -targets https://google.com,https://prometheus.io
+```
+or
+```sh
+docker run -p "9271:9271" --rm \
+    --env PAGESPEED_API_KEY={KEY} \
+    --env PAGESPEED_TARGETS=https://google.com,https://prometheus.io \
+    foomo/pagespeed-exporter
 ```
