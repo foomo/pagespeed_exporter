@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/foomo/pagespeed_exporter/collector"
+	"os"
 	"time"
 )
 
@@ -24,10 +25,10 @@ func main() {
 }
 
 func parseFlags() {
-	flag.StringVar(&googleApiKey, "api-key", "", "sets the google API key used for pagespeed")
-	flag.StringVar(&listenerAddress, "listener", ":9271", "sets the listener address for the exporters")
-	targetsFlag := flag.String("targets", "", "comma separated list of targets to measure")
-	intervalFlag := flag.String("interval", "1h", "check interval (e.g. 3s 4h 5d ...)")
+	flag.StringVar(&googleApiKey, "api-key", getenv("PAGESPEED_API_KEY", ""), "sets the google API key used for pagespeed")
+	flag.StringVar(&listenerAddress, "listener", getenv("PAGESPEED_LISTENER", ":9271"), "sets the listener address for the exporters")
+	targetsFlag := flag.String("targets", getenv("PAGESPEED_TARGETS", ""), "comma separated list of targets to measure")
+	intervalFlag := flag.String("interval", getenv("PAGESPEED_INTERVAL", "1h"), "check interval (e.g. 3s 4h 5d ...)")
 
 	flag.Parse()
 
@@ -37,7 +38,7 @@ func parseFlags() {
 		log.Fatal("google api key parameter must be specified")
 	}
 
-	if len(targets) == 0 {
+	if len(targets) == 0 || targets[0] == "" {
 		log.Fatal("at least one target must be specified for metrics")
 	}
 
@@ -46,4 +47,11 @@ func parseFlags() {
 	} else {
 		checkInterval = duration
 	}
+}
+
+func getenv(key string, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
