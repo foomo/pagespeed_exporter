@@ -1,4 +1,4 @@
-package exporter
+package collector
 
 import (
 	"github.com/foomo/pagespeed_exporter/googleapi"
