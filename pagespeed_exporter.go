@@ -22,8 +22,9 @@ var (
 )
 
 func main() {
-	parseFlags()
 	log.Infof("starting pagespeed exporter version %s", Version)
+
+	parseFlags()
 	exp := collector.NewCollector(listenerAddress, googleApiKey, targets, checkInterval)
 	log.Fatal(exp.Start())
 }
