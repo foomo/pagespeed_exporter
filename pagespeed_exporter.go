@@ -17,9 +17,13 @@ var (
 	checkInterval   time.Duration
 )
 
+var (
+	Version string
+)
+
 func main() {
 	parseFlags()
-
+	log.Infof("starting pagespeed exporter version %s", Version)
 	exp := collector.NewCollector(listenerAddress, googleApiKey, targets, checkInterval)
 	log.Fatal(exp.Start())
 }
