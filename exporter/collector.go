@@ -1,7 +1,6 @@
-package collector
+package exporter
 
 import (
-	"github.com/foomo/pagespeed_exporter/exporter"
 	"github.com/foomo/pagespeed_exporter/googleapi"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
@@ -33,8 +32,7 @@ func NewCollector(listenerAddress, googleApiKey string, targets []string, checkI
 }
 
 func (e *PagespeedCollector) Start() error {
-	startupMessage := "starting pagespeed exporter on listener %s for %d target(s) with re-check interval of %s"
-	log.Infof(startupMessage, e.listenerAddress, len(e.targets), e.checkInterval)
+	log.Infof("starting pagespeed exporter on listener %s for %d target(s)", e.listenerAddress, len(e.targets), e.checkInterval)
 
 	s := &http.Server{
 		Addr: e.listenerAddress,
@@ -44,7 +42,7 @@ func (e *PagespeedCollector) Start() error {
 	http.Handle("/metrics", promhttp.Handler())
 
 	// Register prometheus metrics resultListeners
-	e.registerListener(exporter.PrometheusMetricsListener)
+	e.registerListener(PrometheusMetricsListener)
 
 	go e.watch()
 	go e.collect()

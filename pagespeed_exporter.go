@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
+	"github.com/foomo/pagespeed_exporter/exporter"
 	log "github.com/sirupsen/logrus"
 	"strings"
 
-	"github.com/foomo/pagespeed_exporter/collector"
 	"os"
 	"time"
 )
@@ -25,7 +25,7 @@ func main() {
 	log.Infof("starting pagespeed exporter version %s", Version)
 
 	parseFlags()
-	exp := collector.NewCollector(listenerAddress, googleApiKey, targets, checkInterval)
+	exp := exporter.NewCollector(listenerAddress, googleApiKey, targets, checkInterval)
 	log.Fatal(exp.Start())
 }
 
