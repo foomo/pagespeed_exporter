@@ -39,9 +39,9 @@ vet:
 	@echo ">> vetting code"
 	@$(GO) vet $(pkgs)
 
-build: glide
+build:
 	@echo ">> building binaries"
-	@GOARCH=amd64 GOOS=linux CGO_ENABLED=0 $(GO) build -o pagespeed_exporter pagespeed_exporter.go
+	@CGO_ENABLED=0 $(GO) build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o pagespeed_exporter pagespeed_exporter.go
 
 docker-build:
 	@echo ">> building docker image"
@@ -51,8 +51,5 @@ docker-push:
 	@echo ">> pushing docker image"
 	@docker login -u="$(DOCKER_USERNAME)" -p="$(DOCKER_PASSWORD)"
 	@docker push $(DOCKER_IMAGE_NAME)
-
-glide:
-	@go get github.com/Masterminds/glide && glide install
 
 .PHONY: all style format build test vet tarball docker promu
