@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	"github.com/foomo/pagespeed_exporter/scraper"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
@@ -34,10 +33,6 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		logrus.WithError(errScrape).Warn("Could not scrape targets")
 		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc("pagespeed_error", "Error scraping target", nil, nil), errScrape)
 		return
-	}
-
-	for _, s := range scrapes {
-		spew.Dump(s)
 	}
 
 	ch <- prometheus.MustNewConstMetric(

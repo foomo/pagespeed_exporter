@@ -11,6 +11,7 @@ script:
   - make
 
 after_success:
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then
-      make docker-build && make docker-push;
-    fi;
+  - if [[ -n "${TRAVIS_TAG}" ]]; then
+    DOCKER_IMAGE_TAG=${TRAVIS_TAG} make docker-build;
+    DOCKER_IMAGE_TAG=${TRAVIS_TAG} make docker-push;
+  fi
