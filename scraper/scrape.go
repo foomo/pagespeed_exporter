@@ -14,19 +14,6 @@ const (
 	StrategyDesktop = Strategy("desktop")
 )
 
-type Scrape struct {
-	Target   string
-	Strategy Strategy
-	Result   *pagespeedonline.PagespeedApiPagespeedResponseV4
-}
-
-type Strategy string
-
-type scrapeRequest struct {
-	target   string
-	strategy Strategy
-}
-
 var _ Service = &pagespeedService{}
 
 type Service interface {
@@ -92,19 +79,19 @@ func (s pagespeedService) scrape(request scrapeRequest) (scrape *Scrape, err err
 	return &Scrape{
 		Target:   request.target,
 		Strategy: request.strategy,
-		Result:   result,
+		Result:   newFromPagespeedResults(result),
 	}, nil
 }
 
 func getScrapeClient() *http.Client {
 	var netTransport = &http.Transport{
 		DialContext: (&net.Dialer{
-			Timeout: 5 * time.Second,
+			Timeout: 15 * time.Second,
 		}).DialContext,
 		TLSHandshakeTimeout: 5 * time.Second,
 	}
 	return &http.Client{
-		Timeout:   time.Second * 10,
+		Timeout:   time.Second * 15,
 		Transport: netTransport,
 	}
 
