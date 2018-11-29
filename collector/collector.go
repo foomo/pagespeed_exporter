@@ -27,7 +27,7 @@ func (c collector) Describe(ch chan<- *prometheus.Desc) {
 // Collect implements Prometheus.Collector.
 func (c collector) Collect(ch chan<- prometheus.Metric) {
 	start := time.Now()
-	scrapes, errScrape := c.scrapeService.Scrape(c.targets)
+	_, errScrape := c.scrapeService.Scrape(c.targets)
 
 	if errScrape != nil {
 		logrus.WithError(errScrape).Warn("Could not scrape targets")
