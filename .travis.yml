@@ -15,3 +15,5 @@ after_success:
     DOCKER_IMAGE_TAG=${TRAVIS_TAG} make docker-build;
     DOCKER_IMAGE_TAG=${TRAVIS_TAG} make docker-push;
   fi
+
+
