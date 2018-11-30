@@ -1,8 +1,11 @@
-package scraper
+package collector
 
 import (
+	"context"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/api/pagespeedonline/v4"
+	"golang.org/x/oauth2"
+	"google.golang.org/api/googleapi/transport"
+	"google.golang.org/api/pagespeedonline/v5"
 	"net"
 	"net/http"
 	"sync"
@@ -14,23 +17,38 @@ const (
 	StrategyDesktop = Strategy("desktop")
 )
 
-var _ Service = &pagespeedService{}
+type Scrape struct {
+	Target   string
+	Strategy Strategy
+	Result   *pagespeedonline.PagespeedApiPagespeedResponseV5
+}
 
-type Service interface {
+type Strategy string
+
+type scrapeRequest struct {
+	target   string
+	strategy Strategy
+}
+
+var _ scrapeService = &pagespeedScrapeService{}
+
+type scrapeService interface {
 	Scrape(targets []string) (scrapes []*Scrape, err error)
 }
 
-func New() Service {
-	return &pagespeedService{
-		scrapeClient: getScrapeClient(),
+func newPagespeedScrapeService(clientTimeout time.Duration, googleApiKey string) scrapeService {
+	return &pagespeedScrapeService{
+		scrapeClient: getScrapeClient(clientTimeout),
+		googleApiKey: googleApiKey,
 	}
 }
 
-type pagespeedService struct {
+type pagespeedScrapeService struct {
 	scrapeClient *http.Client
+	googleApiKey string
 }
 
-func (s *pagespeedService) Scrape(targets []string) (scrapes []*Scrape, err error) {
+func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, err error) {
 	strategies := []Strategy{StrategyDesktop, StrategyMobile}
 	var scrapeRequests []scrapeRequest
 	for _, t := range targets {
@@ -63,35 +81,42 @@ func (s *pagespeedService) Scrape(targets []string) (scrapes []*Scrape, err erro
 	return
 }
 
-func (s pagespeedService) scrape(request scrapeRequest) (scrape *Scrape, err error) {
+func (s pagespeedScrapeService) scrape(request scrapeRequest) (scrape *Scrape, err error) {
+
 	service, errClient := pagespeedonline.New(s.scrapeClient)
 	if err != nil {
 		return nil, errClient
 	}
 	call := service.Pagespeedapi.Runpagespeed(request.target)
+	call.Category( "performance", "seo", "pwa")
 	call.Strategy(string(request.strategy))
-	call.Snapshots(false)
-	call.Screenshot(false)
+
+	call.Context(context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
+		Transport: &transport.APIKey{Key: s.googleApiKey},
+	}))
+
 	result, errResult := call.Do()
+
 	if errResult != nil {
 		return nil, errResult
 	}
+
 	return &Scrape{
 		Target:   request.target,
 		Strategy: request.strategy,
-		Result:   newFromPagespeedResults(result),
+		Result:   result,
 	}, nil
 }
 
-func getScrapeClient() *http.Client {
+func getScrapeClient(timeout time.Duration) *http.Client {
 	var netTransport = &http.Transport{
 		DialContext: (&net.Dialer{
-			Timeout: 15 * time.Second,
+			Timeout: timeout,
 		}).DialContext,
 		TLSHandshakeTimeout: 5 * time.Second,
 	}
 	return &http.Client{
-		Timeout:   time.Second * 15,
+		Timeout:   timeout,
 		Transport: netTransport,
 	}
 

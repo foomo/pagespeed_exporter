@@ -1,6 +1,13 @@
 # Pagespeed Exporter
 [![Travis CI](https://travis-ci.org/foomo/pagespeed_exporter.svg?branch=master)](https://travis-ci.org/foomo/pagespeed_exporter)
 
+
+## Understanding Metrics
+
+* https://github.com/GoogleChrome/lighthouse/blob/master/docs/understanding-results.md
+* https://developers.google.com/speed/docs/insights/v5/reference/pagespeedapi/runpagespeed
+
+
 Prometheus exporter for google pagespeed metrics
 
 
@@ -29,10 +36,9 @@ pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus
 |-----------|--------------------|---------------------------------------------|---------|----------|
 | -api-key  | PAGESPEED_API_KEY  | sets the google API key used for pagespeed  |         | True     |
 | -targets  | PAGESPEED_TARGETS  | comma separated list of targets to measure  |         | True     |
-| -interval | PAGESPEED_INTERVAL | check interval (e.g. 3s 4h 5d ...)          | 1h      | False    |
 | -listener | PAGESPEED_LISTENER | sets the listener address for the exporters | :9271   | False    |
 
-
+Note: google api key is required only if scraping more than 2 targets/second
 ### Docker
 
 ```sh
@@ -45,3 +51,6 @@ docker run -p "9271:9271" --rm \
     --env PAGESPEED_TARGETS=https://google.com,https://prometheus.io \
     foomo/pagespeed-exporter
 ```
+
+
+### Prometheus Configuration

@@ -10,6 +10,14 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = "UT"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -32,6 +40,14 @@
   pruneopts = "UT"
   revision = "c12348ce28de40eed0136aa2b644d0ee0650e56c"
   version = "v1.0.1"
+
+[[projects]]
+  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  pruneopts = "UT"
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:26663fafdea73a38075b07e8e9d82fc0056379d2be8bb4e13899e8fda7c7dd23"
@@ -67,7 +83,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ef74914912f99c79434d9c09658274678bc85080ebe3ab32bec3940ebce5e1fc"
+  digest = "1:9ea97158ea06d60b1f324aa384f6a4cbd596a81b3cae994e17108b195f398d01"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
@@ -76,7 +92,7 @@
     "xfs",
   ]
   pruneopts = "UT"
-  revision = "619930b0b4713cc1280189bf0a4c54b3fb506f60"
+  revision = "aa55a523dc0a8297edf51bb75e8eec13eb3be45d"
 
 [[projects]]
   digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
@@ -87,12 +103,42 @@
   version = "v1.2.0"
 
 [[projects]]
+  digest = "1:18752d0b95816a1b777505a97f71c7467a8445b8ffb55631a7bf779f6ba4fa83"
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  pruneopts = "UT"
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
+
+[[projects]]
   branch = "master"
   digest = "1:38f553aff0273ad6f367cb0a0f8b6eecbaef8dc6cb8b50e57b6a81c1d5b1e332"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
   revision = "eb0de9b17e854e9b1ccd9963efafc79862359959"
+
+[[projects]]
+  branch = "master"
+  digest = "1:f8b491a7c25030a895a0e579742d07136e6958e77ef2d46e769db8eec4e58fcd"
+  name = "golang.org/x/net"
+  packages = [
+    "context",
+    "context/ctxhttp",
+  ]
+  pruneopts = "UT"
+  revision = "fae4c4e3ad76c295c3d6d259f898136b4bf833a8"
+
+[[projects]]
+  branch = "master"
+  digest = "1:7bea7ba08178336c2c82ba215c8e101fe23fd2dc809dd38d4141640442149c2d"
+  name = "golang.org/x/oauth2"
+  packages = [
+    ".",
+    "internal",
+  ]
+  pruneopts = "UT"
+  revision = "28207608b83849a028d4f12e46533a6b6894ecaf"
 
 [[projects]]
   branch = "master"
@@ -107,16 +153,34 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ce7737ec0eed917fbd8e83c9c58b41be49532f4fb11b3cd4f4a16d572e7f4857"
+  digest = "1:04624bbfcf1a7df7e8480bd01ee4f74bbb2fa577ff8a82a216a64bbfeb6add53"
   name = "google.golang.org/api"
   packages = [
     "gensupport",
     "googleapi",
     "googleapi/internal/uritemplates",
+    "googleapi/transport",
     "pagespeedonline/v4",
+    "pagespeedonline/v5",
   ]
   pruneopts = "UT"
-  revision = "0a71a4356c3f4bcbdd16294c78ca2a31fda36cca"
+  revision = "af4fc4062c262223ddc2d92f5f35a93690db383a"
+
+[[projects]]
+  digest = "1:08206298775e5b462e6c0333f4471b44e63f1a70e42952b6ede4ecc9572281eb"
+  name = "google.golang.org/appengine"
+  packages = [
+    "internal",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/remote_api",
+    "internal/urlfetch",
+    "urlfetch",
+  ]
+  pruneopts = "UT"
+  revision = "4a4468ece617fc8205e99368fa2200e9d1fad421"
+  version = "v1.3.0"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -125,7 +189,11 @@
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/sirupsen/logrus",
+    "github.com/stretchr/testify/assert",
+    "golang.org/x/oauth2",
+    "google.golang.org/api/googleapi/transport",
     "google.golang.org/api/pagespeedonline/v4",
+    "google.golang.org/api/pagespeedonline/v5",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

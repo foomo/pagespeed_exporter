@@ -10,14 +10,12 @@ import (
 	"strings"
 
 	"os"
-	"time"
 )
 
 var (
 	googleApiKey    string
 	listenerAddress string
 	targets         []string
-	checkInterval   time.Duration
 )
 
 var (
@@ -25,10 +23,11 @@ var (
 )
 
 func main() {
-	log.Infof("starting pagespeed exporter version %s", Version)
-
 	parseFlags()
-	psc, errCollector := collector.NewCollector(targets)
+
+	log.Infof("starting pagespeed exporter version %s on address %s", Version, listenerAddress)
+
+	psc, errCollector := collector.NewCollector(targets, googleApiKey)
 	if errCollector != nil {
 		log.WithError(errCollector).Fatal("could not instantiate collector")
 	}
@@ -45,10 +44,6 @@ func parseFlags() {
 	flag.Parse()
 
 	targets = strings.Split(*targetsFlag, ",")
-
-	if googleApiKey == "" {
-		log.Fatal("google api key parameter must be specified")
-	}
 
 	if len(targets) == 0 || targets[0] == "" {
 		log.Fatal("at least one target must be specified for metrics")
