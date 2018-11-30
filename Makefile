@@ -50,6 +50,7 @@ docker-build:
 docker-push:
 	@echo ">> pushing docker image"
 	@docker login -u="$(DOCKER_USERNAME)" -p="$(DOCKER_PASSWORD)"
-	@docker push $(DOCKER_IMAGE_NAME)
+	@docker push $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
+	@docker push $(DOCKER_IMAGE_NAME):latest
 
 .PHONY: all style format build test vet tarball docker promu
