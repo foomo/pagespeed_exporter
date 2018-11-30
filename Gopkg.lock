@@ -153,14 +153,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:04624bbfcf1a7df7e8480bd01ee4f74bbb2fa577ff8a82a216a64bbfeb6add53"
+  digest = "1:896fde74b24d95e8bc422d3a003379f1ac91d935f93b6db01d9341003171b4a2"
   name = "google.golang.org/api"
   packages = [
     "gensupport",
     "googleapi",
     "googleapi/internal/uritemplates",
     "googleapi/transport",
-    "pagespeedonline/v4",
     "pagespeedonline/v5",
   ]
   pruneopts = "UT"
@@ -192,7 +191,6 @@
     "github.com/stretchr/testify/assert",
     "golang.org/x/oauth2",
     "google.golang.org/api/googleapi/transport",
-    "google.golang.org/api/pagespeedonline/v4",
     "google.golang.org/api/pagespeedonline/v5",
   ]
   solver-name = "gps-cdcl"

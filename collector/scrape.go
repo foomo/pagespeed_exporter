@@ -6,7 +6,6 @@ import (
 	"golang.org/x/oauth2"
 	"google.golang.org/api/googleapi/transport"
 	"google.golang.org/api/pagespeedonline/v5"
-	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -37,15 +36,18 @@ type scrapeService interface {
 }
 
 func newPagespeedScrapeService(clientTimeout time.Duration, googleApiKey string) scrapeService {
+	client := &http.Client{
+		Timeout:   clientTimeout,
+		Transport: &transport.APIKey{Key: googleApiKey},
+	}
+
 	return &pagespeedScrapeService{
-		scrapeClient: getScrapeClient(clientTimeout),
-		googleApiKey: googleApiKey,
+		scrapeClient: client,
 	}
 }
 
 type pagespeedScrapeService struct {
 	scrapeClient *http.Client
-	googleApiKey string
 }
 
 func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, err error) {
@@ -62,8 +64,11 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(scrapeRequests))
+
+	results := make(chan *Scrape, len(scrapeRequests))
+
 	for _, sr := range scrapeRequests {
-		go func(req scrapeRequest) {
+		go func(req scrapeRequest, res chan *Scrape) {
 			scrape, errScrape := s.scrape(req)
 			if errScrape != nil {
 				logrus.WithError(errScrape).
@@ -72,12 +77,16 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 						"strategy": req.strategy,
 					}).Warn("target scraping returned an error")
 			} else {
-				scrapes = append(scrapes, scrape)
+				res <- scrape
 			}
 			wg.Done()
-		}(sr)
+		}(sr, results)
 	}
 	wg.Wait()
+
+	for elem := range results {
+		scrapes = append(scrapes, elem)
+	}
 	return
 }
 
@@ -88,12 +97,10 @@ func (s pagespeedScrapeService) scrape(request scrapeRequest) (scrape *Scrape, e
 		return nil, errClient
 	}
 	call := service.Pagespeedapi.Runpagespeed(request.target)
-	call.Category( "performance", "seo", "pwa")
+	call.Category("performance", "seo", "pwa")
 	call.Strategy(string(request.strategy))
 
-	call.Context(context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
-		Transport: &transport.APIKey{Key: s.googleApiKey},
-	}))
+	call.Context(context.WithValue(context.Background(), oauth2.HTTPClient, s.scrapeClient))
 
 	result, errResult := call.Do()
 
@@ -106,18 +113,4 @@ func (s pagespeedScrapeService) scrape(request scrapeRequest) (scrape *Scrape, e
 		Strategy: request.strategy,
 		Result:   result,
 	}, nil
-}
-
-func getScrapeClient(timeout time.Duration) *http.Client {
-	var netTransport = &http.Transport{
-		DialContext: (&net.Dialer{
-			Timeout: timeout,
-		}).DialContext,
-		TLSHandshakeTimeout: 5 * time.Second,
-	}
-	return &http.Client{
-		Timeout:   timeout,
-		Transport: netTransport,
-	}
-
 }
