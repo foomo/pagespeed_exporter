@@ -39,9 +39,15 @@ vet:
 	@echo ">> vetting code"
 	@$(GO) vet $(pkgs)
 
-build:
+build: dep
 	@echo ">> building binaries"
+	@dep ensure
 	@CGO_ENABLED=0 $(GO) build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o pagespeed_exporter pagespeed_exporter.go
+
+dep:
+ifeq ($(shell command -v dep 2> /dev/null),)
+	go get -u -v github.com/golang/dep/cmd/dep
+endif
 
 docker-build:
 	@echo ">> building docker image"
