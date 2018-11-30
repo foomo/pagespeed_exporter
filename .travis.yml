@@ -2,8 +2,6 @@ language: go
 go:
   - 1.11.2
 
-sudo: required
-
 services:
   - docker
 
