@@ -15,5 +15,5 @@
 glide.lock
 
 vendor/
-
+dist/
 .idea/
