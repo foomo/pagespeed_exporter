@@ -1,7 +1,7 @@
 # .goreleaser.yml
 # Build customization
 builds:
-- binary: gotsrpc
+- binary: pagespeed_exporter
   main:   ./pagespeed_exporter.go
   env:
   - CGO_ENABLED=0
