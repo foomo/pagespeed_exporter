@@ -34,8 +34,8 @@
   version = "1.2.0"
 
 [[constraint]]
-  name = "github.com/stretchr/testify"
-  version = "1.2.2"
+  branch = "master"
+  name = "golang.org/x/oauth2"
 
 [[constraint]]
   branch = "master"
