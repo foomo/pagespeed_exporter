@@ -7,7 +7,7 @@ services:
 
 cache:
   directories:
-    - ./vendor
+    - $GOPATH/pkg/dep
 
 script:
   - make

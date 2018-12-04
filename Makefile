@@ -26,7 +26,7 @@ vet:
 .PHONY: build
 build: dep
 	@echo ">> building binaries"
-	@dep ensure
+	@dep ensure -vendor-only
 	@CGO_ENABLED=0 $(GO) build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o pagespeed_exporter pagespeed_exporter.go
 
 .PHONY: dep
