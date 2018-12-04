@@ -17,3 +17,4 @@ glide.lock
 vendor/
 dist/
 .idea/
+pagespeed_exporter

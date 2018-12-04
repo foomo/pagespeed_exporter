@@ -1,7 +1,11 @@
 PREFIX              ?= $(shell pwd)
 BIN_DIR             ?= $(shell pwd)
 
-all: format build test
+GO           := GO15VENDOREXPERIMENT=1 go
+pkgs          = $(shell $(GO) list ./... | grep -v /vendor/)
+
+
+all: format build test style
 
 .PHONY: style
 style:
@@ -37,6 +41,7 @@ endif
 
 .PHONY: release
 release: goreleaser
+	rm -f pagespeed_exporter
 	goreleaser --rm-dist
 
 .PHONY: goreleaser
