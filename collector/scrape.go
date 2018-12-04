@@ -2,7 +2,6 @@ package collector
 
 import (
 	"context"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/googleapi/transport"
