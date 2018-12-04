@@ -51,3 +51,8 @@ docker run -p "9271:9271" --rm \
     --env PAGESPEED_TARGETS=https://google.com,https://prometheus.io \
     foomo/pagespeed_exporter
 ```
+
+
+### Prometheus & Docker Compose
+
+Check out the docker-compose folder

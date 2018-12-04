@@ -87,14 +87,15 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 		}(sr, results)
 	}
 	go func() {
-		for {
+		for results != nil {
 			select {
-			case elem := <-results:
-				scrapes = append(scrapes, elem)
+			case elem, ok := <-results:
+				if ok {
+					scrapes = append(scrapes, elem)
+				}
 			}
 		}
 	}()
-
 	wg.Wait()
 
 	return
