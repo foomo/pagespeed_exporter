@@ -1,0 +1,22 @@
+# .goreleaser.yml
+# Build customization
+builds:
+- binary: gotsrpc
+  main:   ./pagespeed_exporter.go
+  env:
+  - CGO_ENABLED=0
+  ldflags:
+  - -s -w -X main.version={{.Version}}
+  goos:
+  - windows
+  - darwin
+  - linux
+  goarch:
+  - amd64
+
+# .goreleaser.yml
+archive:
+  format: tar.gz
+  format_overrides:
+  - goos: windows
+    format: zip

@@ -11,3 +11,6 @@ cache:
 
 script:
   - make
+  - if [[ -n "${TRAVIS_TAG}" ]]; then
+    make release;
+    fi
