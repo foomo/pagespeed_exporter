@@ -91,8 +91,6 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 			select {
 			case elem := <-results:
 				scrapes = append(scrapes, elem)
-			default:
-				break
 			}
 		}
 	}()
