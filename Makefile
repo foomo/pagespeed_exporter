@@ -1,7 +1,7 @@
 PREFIX              ?= $(shell pwd)
 BIN_DIR             ?= $(shell pwd)
 
-all: format build test style
+all: format build test
 
 .PHONY: style
 style:

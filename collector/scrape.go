@@ -2,6 +2,7 @@ package collector
 
 import (
 	"context"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/googleapi/transport"
@@ -87,12 +88,13 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 		}(sr, results)
 	}
 	go func() {
-		for results != nil {
+		for {
 			select {
 			case elem, ok := <-results:
-				if ok {
-					scrapes = append(scrapes, elem)
+				if !ok {
+					return
 				}
+				scrapes = append(scrapes, elem)
 			}
 		}
 	}()
