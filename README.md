@@ -1,4 +1,4 @@
-# Pagespeed Exporter
+# Prometheus Exporter for Google Pagespeed Online Metrics
 [![Travis CI](https://travis-ci.org/foomo/pagespeed_exporter.svg?branch=master)](https://travis-ci.org/foomo/pagespeed_exporter)
 
 
@@ -42,15 +42,12 @@ Note: google api key is required only if scraping more than 2 targets/second
 ### Docker
 
 ```sh
-docker run -p "9271:9271" --rm foomo/pagespeed-exporter -api-key {KEY} -targets https://google.com,https://prometheus.io
+docker run -p "9271:9271" --rm foomo/pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus.io
 ```
 or
 ```sh
 docker run -p "9271:9271" --rm \
     --env PAGESPEED_API_KEY={KEY} \
     --env PAGESPEED_TARGETS=https://google.com,https://prometheus.io \
-    foomo/pagespeed-exporter
+    foomo/pagespeed_exporter
 ```
-
-
-### Prometheus Configuration

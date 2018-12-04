@@ -33,7 +33,7 @@ RUN GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build \
     -o /pagespeed_exporter pagespeed_exporter.go
 
 # strip and compress the binary
-RUN strip --strip-unneeded pagespeed_exporter
+RUN strip --strip-unneeded /pagespeed_exporter
 RUN upx /pagespeed_exporter
 
 ##############################
