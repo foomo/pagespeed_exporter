@@ -38,7 +38,10 @@ type scrapeService interface {
 func newPagespeedScrapeService(clientTimeout time.Duration, googleApiKey string) scrapeService {
 	client := &http.Client{
 		Timeout:   clientTimeout,
-		Transport: &transport.APIKey{Key: googleApiKey},
+		Transport: http.DefaultTransport,
+	}
+	if googleApiKey != "" {
+		client.Transport = &transport.APIKey{Key: googleApiKey}
 	}
 
 	return &pagespeedScrapeService{
@@ -65,11 +68,14 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 	wg := sync.WaitGroup{}
 	wg.Add(len(scrapeRequests))
 
-	results := make(chan *Scrape, len(scrapeRequests))
+	results := make(chan *Scrape)
+	defer close(results)
 
 	for _, sr := range scrapeRequests {
 		go func(req scrapeRequest, res chan *Scrape) {
+			defer wg.Done()
 			scrape, errScrape := s.scrape(req)
+			logrus.Info("GOT RESULT")
 			if errScrape != nil {
 				logrus.WithError(errScrape).
 					WithFields(logrus.Fields{
@@ -79,14 +85,21 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 			} else {
 				res <- scrape
 			}
-			wg.Done()
 		}(sr, results)
 	}
+	go func() {
+		for {
+			select {
+			case elem := <-results:
+				scrapes = append(scrapes, elem)
+			default:
+				break
+			}
+		}
+	}()
+
 	wg.Wait()
 
-	for elem := range results {
-		scrapes = append(scrapes, elem)
-	}
 	return
 }
 
