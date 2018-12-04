@@ -15,7 +15,7 @@ style:
 .PHONY: test
 test:
 	@echo ">> running tests"
-	@$(GO) test -short -race $(pkgs)
+	@$(GO) test -short $(pkgs)
 
 .PHONY: format
 format:

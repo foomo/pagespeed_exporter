@@ -68,8 +68,7 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 	wg := sync.WaitGroup{}
 	wg.Add(len(scrapeRequests))
 
-	results := make(chan *Scrape)
-	defer close(results)
+	results := make(chan *Scrape, len(scrapeRequests))
 
 	for _, sr := range scrapeRequests {
 		go func(req scrapeRequest, res chan *Scrape) {
@@ -86,18 +85,12 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 			}
 		}(sr, results)
 	}
-	go func() {
-		for {
-			select {
-			case elem, ok := <-results:
-				if !ok {
-					return
-				}
-				scrapes = append(scrapes, elem)
-			}
-		}
-	}()
 	wg.Wait()
+	close(results)
+
+	for s := range results {
+		scrapes = append(scrapes, s)
+	}
 
 	return
 }
@@ -109,7 +102,7 @@ func (s pagespeedScrapeService) scrape(request scrapeRequest) (scrape *Scrape, e
 		return nil, errClient
 	}
 	call := service.Pagespeedapi.Runpagespeed(request.target)
-	call.Category("performance", "seo", "pwa")
+	call.Category("performance", "seo", "pwa", "best-practices", "accessibility")
 	call.Strategy(string(request.strategy))
 
 	call.Context(context.WithValue(context.Background(), oauth2.HTTPClient, s.scrapeClient))
