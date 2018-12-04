@@ -75,7 +75,6 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 		go func(req scrapeRequest, res chan *Scrape) {
 			defer wg.Done()
 			scrape, errScrape := s.scrape(req)
-			logrus.Info("GOT RESULT")
 			if errScrape != nil {
 				logrus.WithError(errScrape).
 					WithFields(logrus.Fields{
