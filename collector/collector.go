@@ -126,15 +126,15 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 
 	for k, v := range lhr.Audits {
 		if timeAuditMetrics[k] {
-			duration, errDuration := time.ParseDuration(v.DisplayValue)
-			if errDuration != nil {
-				return
+			v.DisplayValue = strings.Replace(v.DisplayValue, "\u00a0", "", -1)
+			if duration, errDuration := time.ParseDuration(string(v.DisplayValue)); errDuration == nil {
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc(fqname(prefix, k, "duration_seconds"), v.Description, nil, constLabels),
+					prometheus.GaugeValue,
+					duration.Seconds())
+			} else {
+				logrus.WithError(errDuration).Warn("could not parse time audit metric duration for metric: ", k)
 			}
-
-			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc(fqname(prefix, k, "duration_seconds"), v.Description, nil, constLabels),
-				prometheus.GaugeValue,
-				duration.Seconds())
 		}
 
 		score, err := strconv.ParseFloat(fmt.Sprint(v.Score), 64)
