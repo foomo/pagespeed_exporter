@@ -91,7 +91,7 @@ func collectLoadingExperience(prefix string, lexp *pagespeedonline.PagespeedApiL
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc(fqname(prefix, name, "duration_seconds"), "Percentile metrics for "+strings.Replace(name, "_", " ", -1), nil, constLables),
 			prometheus.GaugeValue,
-			float64(v.Percentile)*1000)
+			float64(v.Percentile)/1000)
 	}
 
 }
@@ -101,7 +101,7 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc(fqname(prefix, "total_duration_seconds"), "The total time spent in seconds loading the page and evaluating audits.", nil, constLables),
 		prometheus.GaugeValue,
-		lhr.Timing.Total*1000) //ms -> seconds
+		lhr.Timing.Total/1000) //ms -> seconds
 
 	for k, v := range lhr.Categories {
 		score, err := strconv.ParseFloat(fmt.Sprint(v.Score), 64)
