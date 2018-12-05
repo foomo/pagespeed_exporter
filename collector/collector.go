@@ -119,7 +119,7 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 		}
 
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(fqname(prefix, "category_score"), v.Description, []string{"category"}, constLabels),
+			prometheus.NewDesc(fqname(prefix, "category_score"), "Lighthouse score for the specified category", []string{"category"}, constLabels),
 			prometheus.GaugeValue,
 			score,
 			k)
