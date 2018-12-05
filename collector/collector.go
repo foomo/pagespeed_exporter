@@ -74,7 +74,7 @@ func getConstLabels(scrape *Scrape) (prometheus.Labels, error) {
 	}
 
 	return prometheus.Labels{
-		"host":     target.Host,
+		"host":     fmt.Sprintf("%s://%s", target.Scheme, target.Host),
 		"path":     target.Path,
 		"strategy": string(scrape.Strategy),
 	}, nil

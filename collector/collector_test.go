@@ -21,10 +21,10 @@ func Test_getConstLabels(t *testing.T) {
 		wantErr    bool
 	}{
 		{"valid mobile", getArgs("https://host/path", StrategyMobile),
-			prometheus.Labels{"host": "host", "path": "/path", "strategy": string(StrategyMobile)}, false},
+			prometheus.Labels{"host": "https://host", "path": "/path", "strategy": string(StrategyMobile)}, false},
 
 		{"valid desktop", getArgs("https://host/path", StrategyDesktop),
-			prometheus.Labels{"host": "host", "path": "/path", "strategy": string(StrategyDesktop)}, false},
+			prometheus.Labels{"host": "https://host", "path": "/path", "strategy": string(StrategyDesktop)}, false},
 
 		{"invalid url", getArgs("http://[fe80::1%en0]:8080/", StrategyMobile),
 			nil, true},
