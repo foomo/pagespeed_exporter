@@ -5,6 +5,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/pagespeedonline/v5"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -31,33 +32,52 @@ func (c collector) Describe(ch chan<- *prometheus.Desc) {
 func (c collector) Collect(ch chan<- prometheus.Metric) {
 	start := time.Now()
 	result, errScrape := c.scrapeService.Scrape(c.targets)
-
 	if errScrape != nil {
 		logrus.WithError(errScrape).Warn("Could not scrape targets")
-		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc("pagespeed_error", "Error scraping target", nil, nil), errScrape)
+		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(fqname("error"), "Error scraping target", nil, nil), errScrape)
 		return
 	}
 
 	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("pagespeed_scrape_duration_seconds", "Total Pagespeed time scrape took for all targets.", nil, nil),
+		prometheus.NewDesc(fqname("scrape_duration_seconds"), "Total Pagespeed time scrape took for all targets.", nil, nil),
 		prometheus.GaugeValue,
 		float64(time.Since(start).Seconds()))
 
 	for _, scrape := range result {
-		collect(scrape, ch)
+		errCollect := collect(scrape, ch)
+		if errCollect != nil {
+			logrus.WithError(errCollect).WithFields(logrus.Fields{
+				"target":   scrape.Target,
+				"strategy": scrape.Strategy,
+			}).Error("could not collect scrape target due to errors")
+		}
 	}
 }
 
-func collect(scrape *Scrape, ch chan<- prometheus.Metric) {
-	constLables := prometheus.Labels{
-		"target":   scrape.Target,
-		"strategy": string(scrape.Strategy),
+func collect(scrape *Scrape, ch chan<- prometheus.Metric) error {
+	constLabels, errLabels := getConstLabels(scrape)
+	if errLabels != nil {
+		return errLabels
 	}
 
 	r := scrape.Result
-	collectLoadingExperience("loading_experience", r.LoadingExperience, constLables, ch)
-	collectLoadingExperience("origin_loading_experience", r.OriginLoadingExperience, constLables, ch)
-	collectLighthouseResults("lighthouse", r.LighthouseResult, constLables, ch)
+	collectLoadingExperience("loading_experience", r.LoadingExperience, constLabels, ch)
+	collectLoadingExperience("origin_loading_experience", r.OriginLoadingExperience, constLabels, ch)
+	collectLighthouseResults("lighthouse", r.LighthouseResult, constLabels, ch)
+	return nil
+}
+
+func getConstLabels(scrape *Scrape) (prometheus.Labels, error) {
+	target, errParse := url.Parse(scrape.Target)
+	if errParse != nil {
+		return nil, errParse
+	}
+
+	return prometheus.Labels{
+		"host":     target.Host,
+		"path":     target.Path,
+		"strategy": string(scrape.Strategy),
+	}, nil
 }
 
 func collectLoadingExperience(prefix string, lexp *pagespeedonline.PagespeedApiLoadingExperienceV5, constLables prometheus.Labels, ch chan<- prometheus.Metric) {
