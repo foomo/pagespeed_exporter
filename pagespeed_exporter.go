@@ -51,7 +51,7 @@ func parseFlags() {
 	flag.StringVar(&googleApiKey, "api-key", getenv("PAGESPEED_API_KEY", ""), "sets the google API key used for pagespeed")
 	flag.StringVar(&listenerAddress, "listener", getenv("PAGESPEED_LISTENER", ":9271"), "sets the listener address for the exporters")
 	targetsFlag := flag.String("targets", getenv("PAGESPEED_TARGETS", ""), "comma separated list of targets to measure")
-	flag.Var(&targets, "t", "Targets on a per-line basis")
+	flag.Var(&targets, "t", "multiple argument parameters")
 
 	flag.Parse()
 
