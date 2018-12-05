@@ -42,3 +42,49 @@ func Test_getConstLabels(t *testing.T) {
 		})
 	}
 }
+
+func Test_convertCategoryToScore(t *testing.T) {
+	type args struct {
+		category string
+	}
+	tests := []struct {
+		name string
+		args args
+		want float64
+	}{
+		{"average", args{"AVERAGE"}, 0.5},
+		{"fast", args{"FAST"}, 1},
+		{"none", args{"NONE"}, -1},
+		{"jibberish", args{""}, -1},
+		{"slow", args{"SLOW"}, 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := convertCategoryToScore(tt.args.category); got != tt.want {
+				t.Errorf("convertCategoryToScore() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_fqname(t *testing.T) {
+	type args struct {
+		values []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"empty", args{[]string{}}, "pagespeed_"},
+		{"single", args{[]string{"one"}}, "pagespeed_one"},
+		{"multi", args{[]string{"one", "two", "three"}}, "pagespeed_one_two_three"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := fqname(tt.args.values...); got != tt.want {
+				t.Errorf("fqname() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
