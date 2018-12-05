@@ -90,6 +90,10 @@ func getConstLabels(scrape *Scrape) (prometheus.Labels, error) {
 }
 
 func collectLoadingExperience(prefix string, lexp *pagespeedonline.PagespeedApiLoadingExperienceV5, constLables prometheus.Labels, ch chan<- prometheus.Metric) {
+	if lexp == nil {
+		return
+	}
+
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc(fqname(prefix, "score"), "The specified score for the loading experience (1 FAST / 0.5 AVERAGE / 0 SLOW)  ", nil, constLables),
 		prometheus.GaugeValue,
