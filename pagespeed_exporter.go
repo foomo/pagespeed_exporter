@@ -55,8 +55,10 @@ func parseFlags() {
 
 	flag.Parse()
 
-	additionalTargets := strings.Split(*targetsFlag, ",")
-	targets = append(targets, additionalTargets...)
+	if *targetsFlag != "" {
+		additionalTargets := strings.Split(*targetsFlag, ",")
+		targets = append(targets, additionalTargets...)
+	}
 
 	if len(targets) == 0 || targets[0] == "" {
 		log.Fatal("at least one target must be specified for metrics")
