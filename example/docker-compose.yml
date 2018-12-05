@@ -5,7 +5,8 @@ services:
     image: foomo/pagespeed_exporter:latest
     restart: unless-stopped
     command:
-    - "-targets=https://www.google.com"
+    - "-t=https://www.google.com"
+    - "-t=https://www.google.com/webhp"
     # - "-api-key=${MY_API_KEY}"
 
   prometheus:
