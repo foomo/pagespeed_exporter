@@ -119,7 +119,7 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 		}
 
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(fqname(prefix, "category", k, "score"), "The total/overall score for category: "+strings.Replace(k, "-", " ", -1), nil, constLables),
+			prometheus.NewDesc(fqname(prefix, k, "score"), v.Description, nil, constLables),
 			prometheus.GaugeValue,
 			score)
 	}
@@ -132,7 +132,7 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 		}
 
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(fqname(prefix, "audit", k), "Lighthouse audit score for "+strings.Replace(k, "-", " ", -1), nil, constLables),
+			prometheus.NewDesc(fqname(prefix, k), v.Description, nil, constLables),
 			prometheus.GaugeValue,
 			score)
 	}
