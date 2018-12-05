@@ -16,6 +16,15 @@ type collector struct {
 	scrapeService scrapeService
 }
 
+var timeAuditMetrics = map[string]bool{
+	"first-contentful-paint": true,
+	"first-cpu-idle":         true,
+	"first-meaningful-paint": true,
+	"interactive":            true,
+	"speed-index":            true,
+	"bootup-time":            true,
+}
+
 func NewCollector(targets []string, googleApiKey string) (coll prometheus.Collector, err error) {
 	return collector{
 		targets:       targets,
@@ -89,7 +98,7 @@ func collectLoadingExperience(prefix string, lexp *pagespeedonline.PagespeedApiL
 	for k, v := range lexp.Metrics {
 		name := strings.TrimSuffix(strings.ToLower(k), "_ms")
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(fqname(prefix, name, "duration_seconds"), "Percentile metrics for "+strings.Replace(name, "_", " ", -1), nil, constLables),
+			prometheus.NewDesc(fqname(prefix, "metrics", name, "duration_seconds"), "Percentile metrics for "+strings.Replace(name, "_", " ", -1), nil, constLables),
 			prometheus.GaugeValue,
 			float64(v.Percentile)/1000)
 	}
@@ -110,22 +119,40 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 		}
 
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(fqname(prefix, k, "score"), "The total/overall score for category: "+strings.Replace(k, "-", " ", -1), nil, constLables),
+			prometheus.NewDesc(fqname(prefix, "category", k, "score"), "The total/overall score for category: "+strings.Replace(k, "-", " ", -1), nil, constLables),
 			prometheus.GaugeValue,
 			score)
 	}
 
 	for k, v := range lhr.Audits {
+		handleTimeAudits(k, v, constLables, ch)
 		score, err := strconv.ParseFloat(fmt.Sprint(v.Score), 64)
 		if err != nil {
 			continue
 		}
 
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(fqname(prefix, k), "Lighthouse audit score for "+strings.Replace(k, "-", " ", -1), nil, constLables),
+			prometheus.NewDesc(fqname(prefix, "audit", k), "Lighthouse audit score for "+strings.Replace(k, "-", " ", -1), nil, constLables),
 			prometheus.GaugeValue,
 			score)
 	}
+}
+
+func handleTimeAudits(key string, res pagespeedonline.LighthouseAuditResultV5, constLabels prometheus.Labels, ch chan<- prometheus.Metric) {
+	if !timeAuditMetrics[key] {
+		return
+	}
+
+	duration, errDuration := time.ParseDuration(res.DisplayValue)
+	if errDuration != nil {
+		return
+	}
+
+	metricName := fqname("lighthouse", strings.Replace(key, "-", "_", -1), "duration")
+	ch <- prometheus.MustNewConstMetric(
+		prometheus.NewDesc(metricName, res.Description, nil, constLabels),
+		prometheus.GaugeValue,
+		duration.Seconds())
 }
 
 func convertCategoryToScore(category string) float64 {
