@@ -26,6 +26,9 @@ func Test_getConstLabels(t *testing.T) {
 		{"valid desktop", getArgs("https://host/path", StrategyDesktop),
 			prometheus.Labels{"host": "https://host", "path": "/path", "strategy": string(StrategyDesktop)}, false},
 
+		{"valid query", getArgs("https://host/path?some=query", StrategyDesktop),
+			prometheus.Labels{"host": "https://host", "path": "/path?some=query", "strategy": string(StrategyDesktop)}, false},
+
 		{"invalid url", getArgs("http://[fe80::1%en0]:8080/", StrategyMobile),
 			nil, true},
 	}
