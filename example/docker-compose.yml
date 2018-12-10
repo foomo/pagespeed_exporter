@@ -1,5 +1,9 @@
 version: "3.7"
 
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
 services:
   pagespeed_exporter:
     image: foomo/pagespeed_exporter:latest
@@ -18,10 +22,14 @@ services:
     - "9090:9090"
     volumes:
     - "./prometheus/config.yml:/etc/prometheus/prometheus.yml:ro"
+    - "prometheus_data:/prometheus"
 
   grafana:
     restart: unless-stopped
     image: grafana/grafana:latest
+    volumes:
+    - "grafana_data:/var/lib/grafana"
+    - "./grafana/provisioning/:/etc/grafana/provisioning/"
     ports:
     - "3000:3000"
     environment:
