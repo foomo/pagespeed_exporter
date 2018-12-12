@@ -2,6 +2,21 @@
 [![Travis CI](https://travis-ci.org/foomo/pagespeed_exporter.svg?branch=master)](https://travis-ci.org/foomo/pagespeed_exporter)
 
 
+## Examples
+
+To start the example with the default dashboard (docker-compose required)
+
+```
+$ git clone git@github.com:foomo/pagespeed_exporter.git
+$ cd pagespeed_exporter/example
+$ docker-compose up -d
+```
+
+After that, the application should be running on ``localhost:3000`` with username admin and password s3cr3t.
+
+The provided dashboard (Pagespeed) will be loaded with data after the first scrape.
+
+
 ## Understanding Metrics
 
 * https://github.com/GoogleChrome/lighthouse/blob/master/docs/understanding-results.md
