@@ -16,6 +16,7 @@ After that, the application should be running on ``localhost:3000`` with usernam
 
 The provided dashboard (Pagespeed) will be loaded with data after the first scrape.
 
+![Dashboard](../assets/dashboard.png?raw=true)
 
 ## Understanding Metrics
 
