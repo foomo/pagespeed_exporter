@@ -18,6 +18,8 @@ The provided dashboard (Pagespeed) will be loaded with data after the first scra
 
 ![Dashboard](../assets/dashboard.png?raw=true)
 
+The  dashboard can be found at [grafana](https://grafana.com/dashboards/9510)
+
 ## Understanding Metrics
 
 * https://github.com/GoogleChrome/lighthouse/blob/master/docs/understanding-results.md
