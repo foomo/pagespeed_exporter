@@ -34,18 +34,18 @@ Prometheus exporter for google pagespeed metrics
 ### Building
 
 ```sh
-make
+$ make
 ```
 
-### Examples 
+### Examples
 
 To run pagespeed exporter we need to obtain the google api key for the pagespeed. 
 Instructions how to create a key for pagespeed can be found [here](https://developers.google.com/speed/docs/insights/v2/first-app)
 
-pagespeed_exporter <arguments>
+`pagespeed_exporter <arguments>`
 
 ```sh
-pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus.io -listener :80
+$ pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus.io -listener :80
 ```
 
 ### Exporter configuration
@@ -61,11 +61,11 @@ Note: google api key is required only if scraping more than 2 targets/second
 ### Docker
 
 ```sh
-docker run -p "9271:9271" --rm foomo/pagespeed_exporter -api-key {KEY} -t https://google.com,https://prometheus.io
+$ docker run -p "9271:9271" --rm foomo/pagespeed_exporter -api-key {KEY} -t https://google.com,https://prometheus.io
 ```
 or
 ```sh
-docker run -p "9271:9271" --rm \
+$ docker run -p "9271:9271" --rm \
     --env PAGESPEED_API_KEY={KEY} \
     --env PAGESPEED_TARGETS=https://google.com,https://prometheus.io \
     foomo/pagespeed_exporter
@@ -75,3 +75,25 @@ docker run -p "9271:9271" --rm \
 ### Prometheus & Docker Compose
 
 Check out the docker-compose folder
+
+### Kubernetes/Helm
+
+You can install the included [Helm](https://docs.helm.sh/install/) chart to your k8s cluster with:
+
+```
+$ helm install helm/pagespeed-exporter
+```
+
+And then, to quickly test it:
+```
+$ kubectl get pods
+pagespeed-exporter-riotous-dragonfly-6b99955999-hj2kw   1/1     Running   0          1m
+
+$ kubectl exec -ti pagespeed-exporter-riotous-dragonfly-6b99955999-hj2kw -- sh
+# apk add curl
+# curl localhost:9271/metrics
+pagespeed_lighthouse_audit_score{audit="first-contentful-paint",host="https://www.google.com",path="/",strategy="mobile"} 1
+pagespeed_lighthouse_audit_score{audit="first-contentful-paint",host="https://www.google.com",path="/webhp",strategy="desktop"} 1
+pagespeed_lighthouse_audit_score{audit="first-contentful-paint",host="https://www.google.com",path="/webhp",strategy="mobile"} 1
+...
+```

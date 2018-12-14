@@ -1,4 +1,4 @@
 apiVersion: v1
 description: Pagespeed Exporter
-name: pagespeed_exporter
+name: pagespeed-exporter
 version: 1.0.0

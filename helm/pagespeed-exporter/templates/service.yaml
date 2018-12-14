@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.name }}
+  name: {{ template "fullname" . }}
   annotations:
   {{- with .Values.service.annotations }}
   {{ toYaml . | indent 4 }}
   {{- end }}
   labels:
-    app.kubernetes.io/name: {{ .Values.name }}
+    app.kubernetes.io/name: {{ template "name" . }}
     app.kubernetes.io/instance: {{ $.Release.Name }}
     {{- with .Values.service.labels }}
     {{ toYaml . | indent 4 }}
@@ -15,9 +15,7 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   selector:
-    app.kubernetes.io/name: {{ .Values.name }}
+    app.kubernetes.io/name: {{ template "name" . }}
     app.kubernetes.io/instance: {{ $.Release.Name }}
   ports:
-    - port: {{ .Values.service.port}}
-      name: http
-      targetPort: http
+    - port: {{ .Values.service.port }}
