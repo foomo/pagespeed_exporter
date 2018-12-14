@@ -1,5 +1,4 @@
 name: pagespeed-exporter
-replicas: 1
 
 service:
   type: ClusterIP
@@ -7,10 +6,13 @@ service:
   annotations:
     prometheus.io/scrape: "true"
 
+replicas: 1
+
 image:
   name: pagespeed_exporter
   repository: foomo/pagespeed_exporter
   tag: latest
+  pullPolicy: IfNotPresent
 
 exporter:
   googleapikey: ""
