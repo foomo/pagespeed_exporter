@@ -16,7 +16,7 @@ After that, the application should be running on ``localhost:3000`` with usernam
 
 The provided dashboard (Pagespeed) will be loaded with data after the first scrape.
 
-![Dashboard](../assets/dashboard.png?raw=true)
+![Dashboard](https://github.com/foomo/pagespeed_exporter/raw/assets/dashboard.png?raw=true)
 
 The  dashboard can be found at [grafana](https://grafana.com/dashboards/9510)
 
