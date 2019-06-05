@@ -17,5 +17,5 @@ image:
 exporter:
   googleapikey: ""
   targets:
-  - https://www.google.com
-  - https://www.google.com/webhp
+    - https://www.google.com
+    - https://www.google.com/webhp

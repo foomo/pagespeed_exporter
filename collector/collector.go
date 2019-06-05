@@ -116,7 +116,15 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 		prometheus.GaugeValue,
 		lhr.Timing.Total/1000) //ms -> seconds
 
-	for k, v := range lhr.Categories {
+	categories := map[string]*pagespeedonline.LighthouseCategoryV5{
+		"performance":    lhr.Categories.Performance,
+		"accessibility":  lhr.Categories.Accessibility,
+		"pwa":            lhr.Categories.Pwa,
+		"best-practices": lhr.Categories.BestPractices,
+		"seo":            lhr.Categories.Seo,
+	}
+
+	for k, v := range categories {
 		score, err := strconv.ParseFloat(fmt.Sprint(v.Score), 64)
 		if err != nil {
 			continue

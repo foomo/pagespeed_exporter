@@ -2,9 +2,11 @@ package collector
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/googleapi/transport"
+	"google.golang.org/api/option"
 	"google.golang.org/api/pagespeedonline/v5"
 	"net/http"
 	"sync"
@@ -97,9 +99,9 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 
 func (s pagespeedScrapeService) scrape(request scrapeRequest) (scrape *Scrape, err error) {
 
-	service, errClient := pagespeedonline.New(s.scrapeClient)
+	service, err := pagespeedonline.NewService(context.Background(), option.WithHTTPClient(s.scrapeClient))
 	if err != nil {
-		return nil, errClient
+		return nil, errors.Wrap(err, "could not initialize pagespeed service")
 	}
 	call := service.Pagespeedapi.Runpagespeed(request.target)
 	call.Category("performance", "seo", "pwa", "best-practices", "accessibility")

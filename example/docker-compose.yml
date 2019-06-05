@@ -9,28 +9,28 @@ services:
     image: foomo/pagespeed_exporter:latest
     restart: unless-stopped
     command:
-    - "-t=https://www.google.com"
-    - "-t=https://www.google.com/webhp"
+      - "-t=https://www.google.com"
+      - "-t=https://www.google.com/webhp"
     # - "-api-key=${MY_API_KEY}"
 
   prometheus:
     restart: unless-stopped
     image: prom/prometheus:latest
     command:
-    - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--config.file=/etc/prometheus/prometheus.yml"
     ports:
-    - "9090:9090"
+      - "9090:9090"
     volumes:
-    - "./prometheus/config.yml:/etc/prometheus/prometheus.yml:ro"
-    - "prometheus_data:/prometheus"
+      - "./prometheus/config.yml:/etc/prometheus/prometheus.yml:ro"
+      - "prometheus_data:/prometheus"
 
   grafana:
     restart: unless-stopped
     image: grafana/grafana:latest
     volumes:
-    - "grafana_data:/var/lib/grafana"
-    - "./grafana/provisioning/:/etc/grafana/provisioning/"
+      - "grafana_data:/var/lib/grafana"
+      - "./grafana/provisioning/:/etc/grafana/provisioning/"
     ports:
-    - "3000:3000"
+      - "3000:3000"
     environment:
-    - GF_SECURITY_ADMIN_PASSWORD=s3cr3t
+      - GF_SECURITY_ADMIN_PASSWORD=s3cr3t

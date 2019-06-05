@@ -28,16 +28,11 @@ vet:
 	@$(GO) vet $(pkgs)
 
 .PHONY: build
-build: dep
+build:
 	@echo ">> building binaries"
-	@dep ensure -vendor-only
+	@go mod download
 	@CGO_ENABLED=0 $(GO) build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o pagespeed_exporter pagespeed_exporter.go
 
-.PHONY: dep
-dep:
-ifeq ($(shell command -v dep 2> /dev/null),)
-	go get -u -v github.com/golang/dep/cmd/dep
-endif
 
 .PHONY: release
 release: goreleaser

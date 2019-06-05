@@ -18,16 +18,16 @@ spec:
         app.kubernetes.io/instance: {{ $.Release.Name }}
     spec:
       containers:
-      - name: {{ template "name" . }}
-        {{- with .Values.image }}
-        image: {{ .repository }}:{{ .tag }}
-        imagePullPolicy: {{ .pullPolicy }}
-        {{- end }}
-        args:
-        - "-api-key={{ .Values.exporter.googleapikey }}"
-        {{- range $_, $target := .Values.exporter.targets }}
-        - "-t={{ $target }}"
-        {{- end }}
-        ports:
-          - containerPort: {{ .Values.service.port }}
-            protocol: TCP
+        - name: {{ template "name" . }}
+          {{- with .Values.image }}
+          image: {{ .repository }}:{{ .tag }}
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          args:
+            - "-api-key={{ .Values.exporter.googleapikey }}"
+          {{- range $_, $target := .Values.exporter.targets }}
+          - "-t={{ $target }}"
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              protocol: TCP
