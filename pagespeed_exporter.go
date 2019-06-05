@@ -16,6 +16,7 @@ var (
 	googleApiKey    string
 	listenerAddress string
 	targets         arrayFlags
+	parallel        bool
 )
 
 var (
@@ -50,6 +51,7 @@ func main() {
 func parseFlags() {
 	flag.StringVar(&googleApiKey, "api-key", getenv("PAGESPEED_API_KEY", ""), "sets the google API key used for pagespeed")
 	flag.StringVar(&listenerAddress, "listener", getenv("PAGESPEED_LISTENER", ":9271"), "sets the listener address for the exporters")
+	flag.BoolVar(&parallel, "parallel", getenv("PAGESPEED_PARALLEL", "false") == "true", "forces parallel execution for pagespeed")
 	targetsFlag := flag.String("targets", getenv("PAGESPEED_TARGETS", ""), "comma separated list of targets to measure")
 	flag.Var(&targets, "t", "multiple argument parameters")
 

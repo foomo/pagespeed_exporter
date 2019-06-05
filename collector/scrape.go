@@ -24,6 +24,11 @@ type Scrape struct {
 	Result   *pagespeedonline.PagespeedApiPagespeedResponseV5
 }
 
+type ScrapeConfig struct {
+	targets  []string
+	parallel bool
+}
+
 type Strategy string
 
 type scrapeRequest struct {
@@ -34,7 +39,7 @@ type scrapeRequest struct {
 var _ scrapeService = &pagespeedScrapeService{}
 
 type scrapeService interface {
-	Scrape(targets []string) (scrapes []*Scrape, err error)
+	Scrape(config ScrapeConfig) (scrapes []*Scrape, err error)
 }
 
 func newPagespeedScrapeService(clientTimeout time.Duration, googleApiKey string) scrapeService {
@@ -55,10 +60,10 @@ type pagespeedScrapeService struct {
 	scrapeClient *http.Client
 }
 
-func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, err error) {
+func (s *pagespeedScrapeService) Scrape(config ScrapeConfig) (scrapes []*Scrape, err error) {
 	strategies := []Strategy{StrategyDesktop, StrategyMobile}
 	var scrapeRequests []scrapeRequest
-	for _, t := range targets {
+	for _, t := range config.targets {
 		for _, s := range strategies {
 			scrapeRequests = append(scrapeRequests, scrapeRequest{
 				target:   t,
@@ -67,33 +72,49 @@ func (s *pagespeedScrapeService) Scrape(targets []string) (scrapes []*Scrape, er
 		}
 	}
 
-	wg := sync.WaitGroup{}
-	wg.Add(len(scrapeRequests))
+	if config.parallel {
+		wg := sync.WaitGroup{}
+		wg.Add(len(scrapeRequests))
 
-	results := make(chan *Scrape, len(scrapeRequests))
+		results := make(chan *Scrape, len(scrapeRequests))
 
-	for _, sr := range scrapeRequests {
-		go func(req scrapeRequest, res chan *Scrape) {
-			defer wg.Done()
-			scrape, errScrape := s.scrape(req)
-			if errScrape != nil {
-				logrus.WithError(errScrape).
+		for _, sr := range scrapeRequests {
+			go func(req scrapeRequest, res chan *Scrape) {
+				defer wg.Done()
+				scrape, err := s.scrape(req)
+				if err != nil {
+					logrus.WithError(err).
+						WithFields(logrus.Fields{
+							"target":   req.target,
+							"strategy": req.strategy,
+						}).Warn("target scraping returned an error")
+					return
+				}
+
+				res <- scrape
+
+			}(sr, results)
+		}
+		wg.Wait()
+		close(results)
+
+		for s := range results {
+			scrapes = append(scrapes, s)
+		}
+	} else {
+		for _, req := range scrapeRequests {
+			scrape, err := s.scrape(req)
+			if err != nil {
+				logrus.WithError(err).
 					WithFields(logrus.Fields{
 						"target":   req.target,
 						"strategy": req.strategy,
 					}).Warn("target scraping returned an error")
-			} else {
-				res <- scrape
+				continue
 			}
-		}(sr, results)
+			scrapes = append(scrapes, scrape)
+		}
 	}
-	wg.Wait()
-	close(results)
-
-	for s := range results {
-		scrapes = append(scrapes, s)
-	}
-
 	return
 }
 

@@ -14,6 +14,7 @@ import (
 type collector struct {
 	targets       []string
 	scrapeService scrapeService
+	parallel      bool
 }
 
 var timeAuditMetrics = map[string]bool{
@@ -32,6 +33,13 @@ func NewCollector(targets []string, googleApiKey string) (coll prometheus.Collec
 	}, nil
 }
 
+func (c collector) scrapeConfig() ScrapeConfig {
+	return ScrapeConfig{
+		parallel: false,
+		targets:  c.targets,
+	}
+}
+
 // Describe implements Prometheus.Collector.
 func (c collector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- prometheus.NewDesc("dummy", "dummy", nil, nil)
@@ -40,7 +48,7 @@ func (c collector) Describe(ch chan<- *prometheus.Desc) {
 // Collect implements Prometheus.Collector.
 func (c collector) Collect(ch chan<- prometheus.Metric) {
 	start := time.Now()
-	result, errScrape := c.scrapeService.Scrape(c.targets)
+	result, errScrape := c.scrapeService.Scrape(c.scrapeConfig())
 	if errScrape != nil {
 		logrus.WithError(errScrape).Warn("Could not scrape targets")
 		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(fqname("error"), "Error scraping target", nil, nil), errScrape)

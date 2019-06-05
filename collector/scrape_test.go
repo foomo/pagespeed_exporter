@@ -7,7 +7,10 @@ import (
 
 func Test_PagespeedScrapeService(t *testing.T) {
 	service := newPagespeedScrapeService(30*time.Second, "")
-	scrapes, err := service.Scrape([]string{"http://example.com/"})
+	scrapes, err := service.Scrape(ScrapeConfig{
+		parallel: false,
+		targets:  []string{"http://example.com/"},
+	})
 	if err != nil {
 		t.Fatal("scrape should not throw an error")
 	}

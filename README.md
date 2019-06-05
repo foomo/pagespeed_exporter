@@ -50,12 +50,13 @@ $ pagespeed_exporter -api-key {KEY} -targets https://google.com,https://promethe
 
 ### Exporter configuration
 
-| Flag      | Variable           | Description                                 | Default | Required |
-|-----------|--------------------|---------------------------------------------|---------|----------|
-| -api-key  | PAGESPEED_API_KEY  | sets the google API key used for pagespeed  |         | True     |
-| -targets  | PAGESPEED_TARGETS  | comma separated list of targets to measure  |         | False    |
-| -t        | NONE               | multi-value target array (check docker comp)|         | False    |
-| -listener | PAGESPEED_LISTENER | sets the listener address for the exporters | :9271   | False    |
+| Flag      | Variable           | Description                                   | Default | Required |
+|-----------|--------------------|-----------------------------------------------|---------|----------|
+| -api-key  | PAGESPEED_API_KEY  | sets the google API key used for pagespeed    |         | True     |
+| -targets  | PAGESPEED_TARGETS  | comma separated list of targets to measure    |         | False    |
+| -t        | NONE               | multi-value target array (check docker comp)  |         | False    |
+| -listener | PAGESPEED_LISTENER | sets the listener address for the exporters   | :9271   | False    |
+| -parallel | PAGESPEED_PARALLEL | sets the execution of targets to be parallel  | false   | False    |
 
 Note: google api key is required only if scraping more than 2 targets/second
 ### Docker
