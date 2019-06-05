@@ -3,12 +3,16 @@ go:
   - 1.12.5
   - latest
 
-services:
-  - docker
+env:
+  - GO111MODULE=on
 
 cache:
   directories:
-    - $GOPATH/pkg/dep
+    - $HOME/.cache/go-build
+    - $HOME/gopath/pkg/mod
+
+services:
+  - docker
 
 script:
   - make
