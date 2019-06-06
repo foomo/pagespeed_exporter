@@ -12,7 +12,7 @@ image:
   name: pagespeed_exporter
   repository: foomo/pagespeed_exporter
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 exporter:
   googleapikey: ""
