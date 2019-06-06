@@ -6,6 +6,10 @@ import (
 )
 
 func Test_PagespeedScrapeService(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping testing in short mode")
+	}
+
 	service := newPagespeedScrapeService(30*time.Second, "")
 	scrapes, err := service.Scrape(ScrapeConfig{
 		parallel: false,
