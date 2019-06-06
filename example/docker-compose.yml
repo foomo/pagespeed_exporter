@@ -8,6 +8,8 @@ services:
   pagespeed_exporter:
     image: foomo/pagespeed_exporter:latest
     restart: unless-stopped
+    ports:
+      - "9271:9271"
     command:
       - "-t=https://www.google.com"
       - "-t=https://www.google.com/webhp"

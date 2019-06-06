@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"github.com/foomo/pagespeed_exporter/collector"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -37,6 +36,11 @@ func (ph httpProbeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 
 	targets := r.URL.Query()["target"]
+
+	for _, target := range targets {
+		log.WithField("target", target).Info("probe requested for target")
+	}
+
 	requests := collector.CalculateScrapeRequests(targets...)
 	if len(requests) == 0 {
 		http.Error(w, "Probe requires at least one target", http.StatusBadRequest)
@@ -83,12 +87,15 @@ func errResponse(w http.ResponseWriter, message string, err error) {
 
 func getScrapeTimeout(r *http.Request) (timeout time.Duration, err error) {
 	// If a timeout is configured via the Prometheus header, add it to the request.
-	fmt.Println("HAEDER:", r.Header.Get(PrometheusTimeoutHeader))
 	if v := r.Header.Get(PrometheusTimeoutHeader); v != "" {
 		timeoutSeconds, err := strconv.ParseFloat(v, 64)
 		if err != nil {
 			return 0, errors.Wrap(err, "could not parse timeout")
 		}
+		if timeoutSeconds == 0 {
+			return DefaultTimeoutDuration, nil
+		}
+
 		return time.Duration(timeoutSeconds*float64(time.Second)) - DefaultTimeOffset, nil
 	}
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gammazero/workerpool"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/googleapi/transport"
 	"google.golang.org/api/option"
@@ -60,10 +60,10 @@ func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeReques
 		request := req
 		wp.Submit(func() {
 
-			scrape, err := pss.scrape(req)
+			scrape, err := pss.scrape(request)
 			if err != nil {
-				logrus.WithError(err).
-					WithFields(logrus.Fields{
+				log.WithError(err).
+					WithFields(log.Fields{
 						"target":   request.Url,
 						"strategy": request.Strategy,
 					}).Warn("target scraping returned an error")
@@ -86,7 +86,6 @@ func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeReques
 }
 
 func (pss pagespeedScrapeService) scrape(request ScrapeRequest) (scrape *ScrapeResult, err error) {
-
 	service, err := pagespeedonline.NewService(context.Background(), option.WithHTTPClient(pss.scrapeClient))
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize pagespeed service")

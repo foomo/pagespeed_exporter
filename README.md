@@ -47,7 +47,34 @@ Instructions how to create a key for pagespeed can be found [here](https://devel
 $ pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus.io -listener :80
 ```
 
-### Exporter configuration
+### Exporter Target Specification
+
+Targets can be configured in either plaintext 
+
+```
+https://github.com/foomo/pagespeed_exporter
+https://mysite.com/test?test=true
+```
+
+Or via JSON which adds additional parameters
+
+```
+// URL can't be invalid
+// Strategy can only be mobile/desktop
+// If strategy is not specified, both desktop & mobile will be used
+// Parameters are passed down to google pagespeed api
+
+{"url":"https://github.com/foomo/pagespeed_exporter","campaign":"test","locale":"en","source":"source"}
+
+{"url":"https://mysite.com/test?test=true","strategy":"mobile"}
+
+```
+
+Configuration specification in JSON and plain is supported both in command line & prometheus configuration 
+
+### Exporter configuration 
+
+Configuration of targets can be done via docker and via prometheus
 
 | Flag      | Variable           | Description                                   | Default | Required |
 |-----------|--------------------|-----------------------------------------------|---------|----------|
@@ -58,6 +85,37 @@ $ pagespeed_exporter -api-key {KEY} -targets https://google.com,https://promethe
 | -parallel | PAGESPEED_PARALLEL | sets the execution of targets to be parallel  | false   | False    |
 
 Note: google api key is required only if scraping more than 2 targets/second
+
+Note: exporter can be run without targets, and later targets provided via prometheus
+
+### Exporter Target Configuration (VIA PROMETHEUS)
+
+Example configuration with simple and complex values
+
+(Examples can ve found in the example folder)
+
+```yaml
+
+  - job_name: pagespeed_exporter_probe
+      metrics_path: /probe
+      # Re-Label configurations so that we can use them
+      # to configure the pagespeed exporter
+      relabel_configs:
+        - source_labels: [__address__]
+          target_label: __param_target
+        - source_labels: [__param_target]
+          target_label: instance
+        - target_label: __address__
+          replacement: "pagespeed_exporter:9271"
+      static_configs:
+        - targets:
+            - 'https://example.com/' # Example PLAIN
+            - '{"url":"https://example.com/","campaign":"test","locale":"en","source":"source"}'  
+            - '{"url":"https://example.com/mobileonly","strategy":"mobile"}'                    
+
+```
+
+
 ### Docker
 
 ```sh

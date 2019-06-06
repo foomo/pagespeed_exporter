@@ -1,5 +1,5 @@
 global:
-  scrape_interval: 1h # By default, scrape targets every 15 seconds.
+  scrape_interval: 30s # By default, scrape targets every 15 seconds.
   scrape_timeout: 30s
 
 scrape_configs:
@@ -10,17 +10,16 @@ scrape_configs:
           - 'pagespeed_exporter:9271'
 
   - job_name: pagespeed_exporter_probe
-      metrics_path: /probe
-      # Re-Label configurations so that we can use them
-      # to configure the pagespeed exporter
-      relabel_configs:
-        - source_labels: [__address__]
-          target_label: __param_target
-        - source_labels: [__param_target]
-          target_label: instance
-        - target_label: __address__
-          replacement: "pagespeed_exporter:9271"
-      static_configs:
-        - targets:
-            - 'https://example.com/' # Example PLAIN
-            - '{"url":"https://example.com/","campaign":"test","locale":"en","source":"source"}'  # Example Complex
+    metrics_path: /probe
+    # Re-Label configurations so that we can use them
+    # to configure the pagespeed exporter
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: "pagespeed_exporter:9271"
+    static_configs:
+      - targets:
+          - 'https://github.com/'
+          - '{"url":"https://github.com/foomo","campaign":"test","locale":"en","source":"source"}'
+          - '{"url":"https://github.com/foomo/pagespeed_exporter","strategy":"mobile"}'
