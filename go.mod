@@ -3,6 +3,7 @@ module github.com/foomo/pagespeed_exporter
 go 1.12
 
 require (
+	github.com/davecgh/go-spew v1.1.1
 	github.com/gammazero/workerpool v0.0.0-20190521015540-3b91a70bc0a1
 	github.com/pkg/errors v0.8.0
 	github.com/prometheus/client_golang v0.9.3

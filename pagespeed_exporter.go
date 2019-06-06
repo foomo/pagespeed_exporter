@@ -43,10 +43,12 @@ func main() {
 	collectorFactory := collector.NewFactory()
 	// Register prometheus target collectors only if there is more than one target
 	if len(targets) > 0 {
+		requests := collector.CalculateScrapeRequests(targets...)
+
 		psc, errCollector := collectorFactory.Create(collector.Config{
-			Targets:      targets,
-			GoogleAPIKey: googleApiKey,
-			Parallel:     parallel,
+			ScrapeRequests: requests,
+			GoogleAPIKey:   googleApiKey,
+			Parallel:       parallel,
 		})
 		if errCollector != nil {
 			log.WithError(errCollector).Fatal("could not instantiate collector")

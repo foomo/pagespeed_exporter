@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/foomo/pagespeed_exporter/collector"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -13,8 +14,9 @@ import (
 )
 
 const (
-	DefaultTimeoutDuration = 30 * time.Second
-	DefaultTimeOffset      = 500 * time.Millisecond // To Allow For Processing Time
+	DefaultTimeoutDuration  = 30 * time.Second
+	DefaultTimeOffset       = 500 * time.Millisecond // To Allow For Processing Time
+	PrometheusTimeoutHeader = "X-Prometheus-ScrapeResult-Timeout-Seconds"
 )
 
 type httpProbeHandler struct {
@@ -34,8 +36,9 @@ func NewProbeHandler(apiKey string, parallel bool, factory collector.Factory) ht
 func (ph httpProbeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 
-	targets := getTargets(r)
-	if len(targets) == 0 {
+	targets := r.URL.Query()["target"]
+	requests := collector.CalculateScrapeRequests(targets...)
+	if len(requests) == 0 {
 		http.Error(w, "Probe requires at least one target", http.StatusBadRequest)
 		return
 	}
@@ -54,10 +57,10 @@ func (ph httpProbeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	registry := prometheus.NewRegistry()
 
 	psc, err := ph.collectorFactory.Create(collector.Config{
-		Targets:       targets,
-		GoogleAPIKey:  ph.googleAPIKey,
-		Parallel:      ph.parallel,
-		ScrapeTimeout: timeout,
+		ScrapeRequests: requests,
+		GoogleAPIKey:   ph.googleAPIKey,
+		Parallel:       ph.parallel,
+		ScrapeTimeout:  timeout,
 	})
 	if err != nil {
 		errResponse(w, "Could not initialize pagespeed collectors", err)
@@ -78,24 +81,16 @@ func errResponse(w http.ResponseWriter, message string, err error) {
 	http.Error(w, message, http.StatusInternalServerError)
 }
 
-func getTargets(r *http.Request) []string {
-	return r.URL.Query()["target"]
-}
-
 func getScrapeTimeout(r *http.Request) (timeout time.Duration, err error) {
 	// If a timeout is configured via the Prometheus header, add it to the request.
-	var timeoutSeconds float64
-
-	if v := r.Header.Get("X-Prometheus-Scrape-Timeout-Seconds"); v != "" {
-		var err error
-		timeoutSeconds, err = strconv.ParseFloat(v, 64)
+	fmt.Println("HAEDER:", r.Header.Get(PrometheusTimeoutHeader))
+	if v := r.Header.Get(PrometheusTimeoutHeader); v != "" {
+		timeoutSeconds, err := strconv.ParseFloat(v, 64)
 		if err != nil {
 			return 0, errors.Wrap(err, "could not parse timeout")
 		}
-	}
-	if timeoutSeconds == 0 {
-		return DefaultTimeoutDuration, nil
+		return time.Duration(timeoutSeconds*float64(time.Second)) - DefaultTimeOffset, nil
 	}
 
-	return time.Duration(timeoutSeconds*float64(time.Second)) - DefaultTimeOffset, nil
+	return DefaultTimeoutDuration, nil
 }

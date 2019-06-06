@@ -27,7 +27,7 @@ type factory struct {
 }
 
 type collector struct {
-	targets       []string
+	requests      []ScrapeRequest
 	scrapeService scrapeService
 	parallel      bool
 }
@@ -45,26 +45,12 @@ var timeAuditMetrics = map[string]bool{
 	"bootup-time":            true,
 }
 
-type Config struct {
-	Targets       []string
-	GoogleAPIKey  string
-	Parallel      bool
-	ScrapeTimeout time.Duration
-}
-
 func newCollector(config Config) (coll prometheus.Collector, err error) {
 	return collector{
-		targets:       config.Targets,
+		requests:      config.ScrapeRequests,
 		scrapeService: newPagespeedScrapeService(config.ScrapeTimeout, config.GoogleAPIKey),
 		parallel:      config.Parallel,
 	}, nil
-}
-
-func (c collector) scrapeConfig() ScrapeConfig {
-	return ScrapeConfig{
-		parallel: false,
-		targets:  c.targets,
-	}
 }
 
 // Describe implements Prometheus.Collector.
@@ -75,7 +61,7 @@ func (c collector) Describe(ch chan<- *prometheus.Desc) {
 // Collect implements Prometheus.Collector.
 func (c collector) Collect(ch chan<- prometheus.Metric) {
 	start := time.Now()
-	result, errScrape := c.scrapeService.Scrape(c.scrapeConfig())
+	result, errScrape := c.scrapeService.Scrape(c.parallel, c.requests)
 	if errScrape != nil {
 		logrus.WithError(errScrape).Warn("Could not scrape targets")
 		ch <- prometheus.NewInvalidMetric(prometheus.NewDesc(fqname("error"), "Error scraping target", nil, nil), errScrape)
@@ -91,14 +77,14 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		errCollect := collect(scrape, ch)
 		if errCollect != nil {
 			logrus.WithError(errCollect).WithFields(logrus.Fields{
-				"target":   scrape.Target,
-				"strategy": scrape.Strategy,
+				"target":   scrape.Request.Url,
+				"strategy": scrape.Request.Strategy,
 			}).Error("could not collect scrape target due to errors")
 		}
 	}
 }
 
-func collect(scrape *Scrape, ch chan<- prometheus.Metric) error {
+func collect(scrape *ScrapeResult, ch chan<- prometheus.Metric) error {
 	constLabels, errLabels := getConstLabels(scrape)
 	if errLabels != nil {
 		return errLabels
@@ -111,8 +97,8 @@ func collect(scrape *Scrape, ch chan<- prometheus.Metric) error {
 	return nil
 }
 
-func getConstLabels(scrape *Scrape) (prometheus.Labels, error) {
-	target, errParse := url.Parse(scrape.Target)
+func getConstLabels(scrape *ScrapeResult) (prometheus.Labels, error) {
+	target, errParse := url.Parse(scrape.Request.Url)
 	if errParse != nil {
 		return nil, errParse
 	}
@@ -120,7 +106,7 @@ func getConstLabels(scrape *Scrape) (prometheus.Labels, error) {
 	return prometheus.Labels{
 		"host":     fmt.Sprintf("%s://%s", target.Scheme, target.Host),
 		"path":     target.RequestURI(),
-		"strategy": string(scrape.Strategy),
+		"strategy": string(scrape.Request.Strategy),
 	}, nil
 }
 
@@ -214,5 +200,5 @@ func convertCategoryToScore(category string) float64 {
 }
 
 func fqname(values ...string) string {
-	return "pagespeed_" + strings.Replace(strings.Join(values, "_"), "-", "_", -1)
+	return fmt.Sprintf("%s_%s", Namespace, strings.Replace(strings.Join(values, "_"), "-", "_", -1))
 }

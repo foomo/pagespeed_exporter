@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
-	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
@@ -36,13 +35,13 @@ func TestProbeHandler(t *testing.T) {
 	handler := NewProbeHandler("KEY", false, mockCollector{})
 	require.NotNil(t, handler)
 
-	require.HTTPSuccess(t, handler.ServeHTTP, "GET", "/probe", map[string][]string{"target": {"derp"}})
-	require.HTTPBodyContains(t, handler.ServeHTTP, "GET", "/probe?target=derp", map[string][]string{"target": {"derp"}}, "test 1")
+	require.HTTPSuccess(t, handler.ServeHTTP, "GET", "/probe", map[string][]string{"target": {"http://test.com"}})
+	require.HTTPBodyContains(t, handler.ServeHTTP, "GET", "/probe", map[string][]string{"target": {"http://test.com"}}, "test 1")
 }
 
 func Test_getScrapeTimeout(t *testing.T) {
 	type args struct {
-		headers http.Header
+		header string
 	}
 	tests := []struct {
 		name        string
@@ -51,13 +50,13 @@ func Test_getScrapeTimeout(t *testing.T) {
 		wantErr     bool
 	}{
 		{"default", args{}, DefaultTimeoutDuration, false},
-		{"set", args{map[string][]string{"X-Prometheus-Scrape-Timeout-Seconds": {"30.5"}}}, 30 * time.Second, false},
-		{"invalid", args{map[string][]string{"X-Prometheus-Scrape-Timeout-Seconds": {"derp"}}}, 0, true},
+		{"set", args{header: "30.5"}, 30 * time.Second, false},
+		{"invalid", args{header: "derp"}, 0, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			request := httptest.NewRequest("GET", "/", nil)
-			request.Header = tt.args.headers
+			request.Header.Add(PrometheusTimeoutHeader, tt.args.header)
 
 			gotTimeout, err := getScrapeTimeout(request)
 			if (err != nil) != tt.wantErr {

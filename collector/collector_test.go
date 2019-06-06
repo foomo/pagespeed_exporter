@@ -9,10 +9,10 @@ import (
 
 func Test_getConstLabels(t *testing.T) {
 	type args struct {
-		scrape *Scrape
+		scrape *ScrapeResult
 	}
 	getArgs := func(target string, strategy Strategy) args {
-		return args{&Scrape{Target: target, Strategy: strategy}}
+		return args{&ScrapeResult{Request: ScrapeRequest{Url: target, Strategy: strategy}}}
 	}
 	tests := []struct {
 		name       string

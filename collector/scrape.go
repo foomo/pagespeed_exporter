@@ -14,36 +14,10 @@ import (
 	"time"
 )
 
-const (
-	StrategyMobile  = Strategy("mobile")
-	StrategyDesktop = Strategy("desktop")
-)
-
-type Scrape struct {
-	Target   string
-	Strategy Strategy
-	Result   *pagespeedonline.PagespeedApiPagespeedResponseV5
-}
-
-type ScrapeConfig struct {
-	targets  []string
-	parallel bool
-}
-
-type Strategy string
-
-type scrapeRequest struct {
-	target   string
-	strategy Strategy
-	campaign string
-	source   string
-	locale   string
-}
-
 var _ scrapeService = &pagespeedScrapeService{}
 
 type scrapeService interface {
-	Scrape(config ScrapeConfig) (scrapes []*Scrape, err error)
+	Scrape(parallel bool, config []ScrapeRequest) (scrapes []*ScrapeResult, err error)
 }
 
 // newPagespeedScrapeService creates a new HTTP client service for pagespeed.
@@ -71,41 +45,33 @@ type pagespeedScrapeService struct {
 	scrapeClient *http.Client
 }
 
-func (pss *pagespeedScrapeService) Scrape(config ScrapeConfig) (scrapes []*Scrape, err error) {
-	strategies := []Strategy{StrategyDesktop, StrategyMobile}
+func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeRequest) (scrapes []*ScrapeResult, err error) {
 
 	maxWorkers := 1
-	if config.parallel {
+	if parallel {
 		maxWorkers = runtime.NumCPU()
 	}
 
 	wp := workerpool.New(maxWorkers)
 
-	results := make(chan *Scrape, 2*len(config.targets))
+	results := make(chan *ScrapeResult, 2*len(requests))
 
-	for _, t := range config.targets {
-		for _, s := range strategies {
-			target := t
-			strategy := s
+	for _, req := range requests {
+		request := req
+		wp.Submit(func() {
 
-			wp.Submit(func() {
-				req := scrapeRequest{
-					target:   target,
-					strategy: strategy,
-				}
-				scrape, err := pss.scrape(req)
-				if err != nil {
-					logrus.WithError(err).
-						WithFields(logrus.Fields{
-							"target":   req.target,
-							"strategy": req.strategy,
-						}).Warn("target scraping returned an error")
-					return
-				}
-				results <- scrape
-			})
+			scrape, err := pss.scrape(req)
+			if err != nil {
+				logrus.WithError(err).
+					WithFields(logrus.Fields{
+						"target":   request.Url,
+						"strategy": request.Strategy,
+					}).Warn("target scraping returned an error")
+				return
+			}
+			results <- scrape
+		})
 
-		}
 	}
 
 	wp.StopWait()
@@ -119,28 +85,38 @@ func (pss *pagespeedScrapeService) Scrape(config ScrapeConfig) (scrapes []*Scrap
 	return
 }
 
-func (pss pagespeedScrapeService) scrape(request scrapeRequest) (scrape *Scrape, err error) {
+func (pss pagespeedScrapeService) scrape(request ScrapeRequest) (scrape *ScrapeResult, err error) {
 
 	service, err := pagespeedonline.NewService(context.Background(), option.WithHTTPClient(pss.scrapeClient))
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize pagespeed service")
 	}
 
-	call := service.Pagespeedapi.Runpagespeed(request.target)
+	call := service.Pagespeedapi.Runpagespeed(request.Url)
 	call.Category("performance", "seo", "pwa", "best-practices", "accessibility")
-	call.Strategy(string(request.strategy))
+	call.Strategy(string(request.Strategy))
+
+	if request.Campaign != "" {
+		call.UtmCampaign(request.Campaign)
+	}
+
+	if request.Locale != "" {
+		call.Locale(request.Locale)
+	}
+
+	if request.Source != "" {
+		call.UtmSource(request.Source)
+	}
 
 	call.Context(context.WithValue(context.Background(), oauth2.HTTPClient, pss.scrapeClient))
 
 	result, errResult := call.Do()
-
 	if errResult != nil {
 		return nil, errResult
 	}
 
-	return &Scrape{
-		Target:   request.target,
-		Strategy: request.strategy,
-		Result:   result,
+	return &ScrapeResult{
+		Request: request,
+		Result:  result,
 	}, nil
 }
