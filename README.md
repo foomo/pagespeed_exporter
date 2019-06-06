@@ -25,7 +25,6 @@ The  dashboard can be found at [grafana](https://grafana.com/dashboards/9510)
 * https://github.com/GoogleChrome/lighthouse/blob/master/docs/understanding-results.md
 * https://developers.google.com/speed/docs/insights/v5/reference/pagespeedapi/runpagespeed
 
-
 Prometheus exporter for google pagespeed metrics
 
 
@@ -52,7 +51,7 @@ $ pagespeed_exporter -api-key {KEY} -targets https://google.com,https://promethe
 
 | Flag      | Variable           | Description                                   | Default | Required |
 |-----------|--------------------|-----------------------------------------------|---------|----------|
-| -api-key  | PAGESPEED_API_KEY  | sets the google API key used for pagespeed    |         | True     |
+| -api-key  | PAGESPEED_API_KEY  | sets the google API key used for pagespeed    |         | False    |
 | -targets  | PAGESPEED_TARGETS  | comma separated list of targets to measure    |         | False    |
 | -t        | NONE               | multi-value target array (check docker comp)  |         | False    |
 | -listener | PAGESPEED_LISTENER | sets the listener address for the exporters   | :9271   | False    |

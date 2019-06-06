@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/foomo/pagespeed_exporter/collector"
+	"github.com/foomo/pagespeed_exporter/handler"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
@@ -39,13 +40,31 @@ func main() {
 
 	log.Infof("starting pagespeed exporter version %s on address %s for %d targets", Version, listenerAddress, len(targets))
 
-	psc, errCollector := collector.NewCollector(targets, googleApiKey)
-	if errCollector != nil {
-		log.WithError(errCollector).Fatal("could not instantiate collector")
+	collectorFactory := collector.NewFactory()
+	// Register prometheus target collectors only if there is more than one target
+	if len(targets) > 0 {
+		psc, errCollector := collectorFactory.Create(collector.Config{
+			Targets:      targets,
+			GoogleAPIKey: googleApiKey,
+			Parallel:     parallel,
+		})
+		if errCollector != nil {
+			log.WithError(errCollector).Fatal("could not instantiate collector")
+		}
+		prometheus.MustRegister(psc)
 	}
-	prometheus.MustRegister(psc)
-	http.Handle("/metrics", promhttp.Handler())
-	log.Fatal(http.ListenAndServe(listenerAddress, nil))
+
+	mux := http.NewServeMux()
+	mux.Handle("/", handler.NewIndexHandler())
+	mux.Handle("/metrics", promhttp.Handler())
+	mux.Handle("/probe", handler.NewProbeHandler(googleApiKey, parallel, collectorFactory))
+
+	server := http.Server{
+		Addr:    listenerAddress,
+		Handler: mux,
+	}
+
+	log.Fatal(server.ListenAndServe())
 }
 
 func parseFlags() {
@@ -63,7 +82,7 @@ func parseFlags() {
 	}
 
 	if len(targets) == 0 || targets[0] == "" {
-		log.Fatal("at least one target must be specified for metrics")
+		log.Info("no targets specified, listening from collector")
 	}
 }
 

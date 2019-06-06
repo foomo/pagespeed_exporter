@@ -11,10 +11,29 @@ import (
 	"time"
 )
 
+var (
+	_ Factory = factory{}
+)
+
+type Factory interface {
+	Create(config Config) (prometheus.Collector, error)
+}
+
+func NewFactory() Factory {
+	return factory{}
+}
+
+type factory struct {
+}
+
 type collector struct {
 	targets       []string
 	scrapeService scrapeService
 	parallel      bool
+}
+
+func (factory) Create(config Config) (prometheus.Collector, error) {
+	return newCollector(config)
 }
 
 var timeAuditMetrics = map[string]bool{
@@ -26,10 +45,18 @@ var timeAuditMetrics = map[string]bool{
 	"bootup-time":            true,
 }
 
-func NewCollector(targets []string, googleApiKey string) (coll prometheus.Collector, err error) {
+type Config struct {
+	Targets       []string
+	GoogleAPIKey  string
+	Parallel      bool
+	ScrapeTimeout time.Duration
+}
+
+func newCollector(config Config) (coll prometheus.Collector, err error) {
 	return collector{
-		targets:       targets,
-		scrapeService: newPagespeedScrapeService(60*time.Second, googleApiKey),
+		targets:       config.Targets,
+		scrapeService: newPagespeedScrapeService(config.ScrapeTimeout, config.GoogleAPIKey),
+		parallel:      config.Parallel,
 	}, nil
 }
 
