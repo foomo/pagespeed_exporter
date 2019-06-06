@@ -91,9 +91,17 @@ func collect(scrape *ScrapeResult, ch chan<- prometheus.Metric) error {
 	}
 
 	r := scrape.Result
-	collectLoadingExperience("loading_experience", r.LoadingExperience, constLabels, ch)
-	collectLoadingExperience("origin_loading_experience", r.OriginLoadingExperience, constLabels, ch)
-	collectLighthouseResults("lighthouse", r.LighthouseResult, constLabels, ch)
+	if r.LoadingExperience != nil {
+		collectLoadingExperience("loading_experience", r.LoadingExperience, constLabels, ch)
+	}
+
+	if r.OriginLoadingExperience != nil {
+		collectLoadingExperience("origin_loading_experience", r.OriginLoadingExperience, constLabels, ch)
+	}
+
+	if r.LighthouseResult != nil {
+		collectLighthouseResults("lighthouse", r.LighthouseResult, constLabels, ch)
+	}
 	return nil
 }
 

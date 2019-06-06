@@ -10,9 +10,7 @@ services:
     restart: unless-stopped
     ports:
       - "9271:9271"
-    command:
-      - "-t=https://www.google.com"
-      - "-t=https://www.google.com/webhp"
+    #command:
     # - "-api-key=${MY_API_KEY}"
 
   prometheus:
