@@ -1,6 +1,8 @@
 global:
-  scrape_interval: 5m # By default, scrape targets every 15 seconds.
-  scrape_timeout: 30s
+  # Important to note, that scrape times > 5minutes can't be handled
+  # by grafana gracefully and will be treated as scarce metrics
+  scrape_interval:  5m # By default, scrape targets every 15 seconds.
+  scrape_timeout: 120s
 
 scrape_configs:
   - job_name: pagespeed_exporter_metrics
@@ -20,5 +22,5 @@ scrape_configs:
         replacement: "pagespeed_exporter:9271"
     static_configs:
       - targets:
-          - 'https://github.com/'
+          - 'https://github.com/foomo/'
           - '{"url":"https://github.com/foomo/pagespeed_exporter","strategy":"mobile"}'

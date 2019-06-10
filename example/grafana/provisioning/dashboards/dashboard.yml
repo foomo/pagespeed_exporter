@@ -7,5 +7,7 @@ providers:
     type: file
     disableDeletion: false
     editable: true
+    jsonData:
+      timeInterval: "5m"
     options:
       path: /etc/grafana/provisioning/dashboards
