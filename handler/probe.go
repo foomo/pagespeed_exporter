@@ -2,14 +2,17 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/foomo/pagespeed_exporter/collector"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/prometheus/push"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 const (
@@ -22,13 +25,17 @@ type httpProbeHandler struct {
 	googleAPIKey     string
 	parallel         bool
 	collectorFactory collector.Factory
+	pushGatewayUrl   string
+	pushGatewayJob   string
 }
 
-func NewProbeHandler(apiKey string, parallel bool, factory collector.Factory) http.Handler {
+func NewProbeHandler(apiKey string, parallel bool, factory collector.Factory, pushGatewayUrl string, pushGatewayJob string) http.Handler {
 	return httpProbeHandler{
 		googleAPIKey:     apiKey,
 		parallel:         parallel,
 		collectorFactory: factory,
+		pushGatewayUrl:   pushGatewayUrl,
+		pushGatewayJob:   pushGatewayJob,
 	}
 }
 
@@ -74,6 +81,14 @@ func (ph httpProbeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := registry.Register(psc); err != nil {
 		errResponse(w, "Could not register collectors", err)
 		return
+	}
+
+	if ph.pushGatewayUrl != "" {
+		if err := push.New(ph.pushGatewayUrl, ph.pushGatewayJob).Collector(psc).Push(); err != nil {
+			errResponse(w, "Error when tried to push to pushgateaway", err)
+		} else {
+			log.Info(fmt.Sprintf("pushed to pushgateway %s job %s with success", ph.pushGatewayUrl, ph.pushGatewayJob))
+		}
 	}
 
 	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{})

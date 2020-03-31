@@ -76,17 +76,29 @@ Configuration specification in JSON and plain is supported both in command line 
 
 Configuration of targets can be done via docker and via prometheus
 
-| Flag      | Variable           | Description                                   | Default | Required |
-|-----------|--------------------|-----------------------------------------------|---------|----------|
-| -api-key  | PAGESPEED_API_KEY  | sets the google API key used for pagespeed    |         | False    |
-| -targets  | PAGESPEED_TARGETS  | comma separated list of targets to measure    |         | False    |
-| -t        | NONE               | multi-value target array (check docker comp)  |         | False    |
-| -listener | PAGESPEED_LISTENER | sets the listener address for the exporters   | :9271   | False    |
-| -parallel | PAGESPEED_PARALLEL | sets the execution of targets to be parallel  | false   | False    |
+| Flag             | Variable           | Description                                   | Default            | Required |
+|------------------|--------------------|-----------------------------------------------|--------------------|----------|
+| -api-key         | PAGESPEED_API_KEY  | sets the google API key used for pagespeed    |                    | False    |
+| -targets         | PAGESPEED_TARGETS  | comma separated list of targets to measure    |                    | False    |
+| -t               | NONE               | multi-value target array (check docker comp)  |                    | False    |
+| -listener        | PAGESPEED_LISTENER | sets the listener address for the exporters   | :9271              | False    |
+| -parallel        | PAGESPEED_PARALLEL | sets the execution of targets to be parallel  | false              | False    |
+| -parallel        | PAGESPEED_PARALLEL | sets the execution of targets to be parallel  | false              | False    |
+| -pushgateway-url | PUSHGATEWAY_URL    | sets the pushgateway url to send the metrics  |                    | False    |
+| -pushgateway-job | PUSHGATEWAY_JOB    | sets the pushgateway job name                 | pagespeed_exporter | False    |
 
 Note: google api key is required only if scraping more than 2 targets/second
 
 Note: exporter can be run without targets, and later targets provided via prometheus
+
+
+### Pushing metrics via push gateway
+
+If you don't want to change the prometheus `scrape_configs`, you can send the metrics using push gateway using a batch job.
+Just configure the pushgateway url and use the `/probe` endpoint with query parameter `target` and the metrics will be send to prometheus.
+
+`curl http://localhost:9271/probe?target=https://www.example.com`
+
 
 ### Exporter Target Configuration (VIA PROMETHEUS)
 

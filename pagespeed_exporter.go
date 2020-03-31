@@ -2,13 +2,14 @@ package main
 
 import (
 	"flag"
+	"net/http"
+	"strings"
+
 	"github.com/foomo/pagespeed_exporter/collector"
 	"github.com/foomo/pagespeed_exporter/handler"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
 
 	"os"
 )
@@ -18,6 +19,8 @@ var (
 	listenerAddress string
 	targets         arrayFlags
 	parallel        bool
+	pushGatewayUrl  string
+	pushGatewayJob  string
 )
 
 var (
@@ -59,7 +62,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/", handler.NewIndexHandler())
 	mux.Handle("/metrics", promhttp.Handler())
-	mux.Handle("/probe", handler.NewProbeHandler(googleApiKey, parallel, collectorFactory))
+	mux.Handle("/probe", handler.NewProbeHandler(googleApiKey, parallel, collectorFactory, pushGatewayUrl, pushGatewayJob))
 
 	server := http.Server{
 		Addr:    listenerAddress,
@@ -73,9 +76,10 @@ func parseFlags() {
 	flag.StringVar(&googleApiKey, "api-key", getenv("PAGESPEED_API_KEY", ""), "sets the google API key used for pagespeed")
 	flag.StringVar(&listenerAddress, "listener", getenv("PAGESPEED_LISTENER", ":9271"), "sets the listener address for the exporters")
 	flag.BoolVar(&parallel, "parallel", getenv("PAGESPEED_PARALLEL", "false") == "true", "forces parallel execution for pagespeed")
+	flag.StringVar(&pushGatewayUrl, "pushGatewayUrl", getenv("PUSHGATEWAY_URL", ""), "sets the push gateway to send the metrics. leave empty to ignore it")
+	flag.StringVar(&pushGatewayJob, "pushGatewayJob", getenv("PUSHGATEWAY_JOB", "pagespeed_exporter"), "sets push gateway job name")
 	targetsFlag := flag.String("targets", getenv("PAGESPEED_TARGETS", ""), "comma separated list of targets to measure")
 	flag.Var(&targets, "t", "multiple argument parameters")
-
 	flag.Parse()
 
 	if *targetsFlag != "" {

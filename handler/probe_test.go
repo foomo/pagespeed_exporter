@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/stretchr/testify/require"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/require"
 
 	"github.com/foomo/pagespeed_exporter/collector"
 )
@@ -32,7 +33,7 @@ func (mockCollector) Create(config collector.Config) (prometheus.Collector, erro
 }
 
 func TestProbeHandler(t *testing.T) {
-	handler := NewProbeHandler("KEY", false, mockCollector{})
+	handler := NewProbeHandler("KEY", false, mockCollector{}, "", "")
 	require.NotNil(t, handler)
 
 	require.HTTPSuccess(t, handler.ServeHTTP, "GET", "/probe", map[string][]string{"target": {"http://test.com"}})
