@@ -83,7 +83,6 @@ Configuration of targets can be done via docker and via prometheus
 | -t               | NONE               | multi-value target array (check docker comp)  |                    | False    |
 | -listener        | PAGESPEED_LISTENER | sets the listener address for the exporters   | :9271              | False    |
 | -parallel        | PAGESPEED_PARALLEL | sets the execution of targets to be parallel  | false              | False    |
-| -parallel        | PAGESPEED_PARALLEL | sets the execution of targets to be parallel  | false              | False    |
 | -pushgateway-url | PUSHGATEWAY_URL    | sets the pushgateway url to send the metrics  |                    | False    |
 | -pushgateway-job | PUSHGATEWAY_JOB    | sets the pushgateway job name                 | pagespeed_exporter | False    |
 
