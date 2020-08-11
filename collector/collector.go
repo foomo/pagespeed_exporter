@@ -2,13 +2,15 @@ package collector
 
 import (
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sirupsen/logrus"
-	"google.golang.org/api/pagespeedonline/v5"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/api/pagespeedonline/v5"
 )
 
 var (
@@ -37,12 +39,19 @@ func (factory) Create(config Config) (prometheus.Collector, error) {
 }
 
 var timeAuditMetrics = map[string]bool{
-	"first-contentful-paint": true,
-	"first-cpu-idle":         true,
-	"first-meaningful-paint": true,
-	"interactive":            true,
-	"speed-index":            true,
-	"bootup-time":            true,
+	"first-contentful-paint":    true,
+	"first-cpu-idle":            true,
+	"first-meaningful-paint":    true,
+	"interactive":               true,
+	"speed-index":               true,
+	"bootup-time":               true,
+	"largest-contentful-paint":  true,
+	"mainthread-work-breakdown": true,
+	"cumulative-layout-shift":   true,
+	"total-blocking-time":       true,
+	"server-response-time":      true,
+	"max-potential-fid":         true,
+	"estimated-input-latency":   true,
 }
 
 func newCollector(config Config) (coll prometheus.Collector, err error) {
@@ -167,9 +176,13 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 	}
 
 	for k, v := range lhr.Audits {
+		re := regexp.MustCompile(`(\d*[.]?\d+(ms|s))|0`)
+
 		if timeAuditMetrics[k] {
-			v.DisplayValue = strings.Replace(v.DisplayValue, "\u00a0", "", -1)
-			if duration, errDuration := time.ParseDuration(string(v.DisplayValue)); errDuration == nil {
+			displayValue := strings.Replace(v.DisplayValue, "\u00a0", "", -1)
+			displayValue = strings.Replace(displayValue, ",", "", -1)
+
+			if duration, errDuration := time.ParseDuration(re.FindString(displayValue)); errDuration == nil {
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc(fqname(prefix, k, "duration_seconds"), v.Description, nil, constLabels),
 					prometheus.GaugeValue,
