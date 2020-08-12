@@ -78,11 +78,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "Performance Score",
       "format": "none",
       "gauge": {
@@ -171,11 +167,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "The Accessibility score is a weighted average of all the accessibility audits. See Scoring Details for a full list of how each audit is weighted. The heavier-weighted audits have a bigger impact on your score.\n\nEach accessibility audit is pass or fail. Unlike the Performance audits, a page doesn't get points for partially passing an accessibility audit. For example, if some elements have screenreader-friendly names, but others don't, that page gets a 0 for the screenreader-friendly-names audit.",
       "format": "none",
       "gauge": {
@@ -264,11 +256,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "Lighthouse returns a Progressive Web App (PWA) score between 0 and 100. 0 is the worst possible score, and 100 is the best.\n\nThe PWA audits are based on the Baseline PWA Checklist, which lists 14 requirements. Lighthouse has automated audits for 11 of the 14 requirements. The remaining 3 can only be tested manually. Each of the 11 automated PWA audits are weighted equally, so each one contributes approximately 9 points to your PWA score.",
       "format": "none",
       "gauge": {
@@ -357,11 +345,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "Search Engine Optimization Score",
       "format": "none",
       "gauge": {
@@ -451,11 +435,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "Lighthouse returns a Best Practices score between 0 and 100. 0 is the worst possible score, and 100 is the best.\n\nThe Best Practices audits are equally weighted. To calculate how much each audit contributes to your overall Best Practices score, count the number of Best Practices audits, then divide 100 by that number.",
       "format": "none",
       "gauge": {
@@ -592,11 +572,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "Performance Score",
       "format": "none",
       "gauge": {
@@ -688,11 +664,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "The Accessibility score is a weighted average of all the accessibility audits. See Scoring Details for a full list of how each audit is weighted. The heavier-weighted audits have a bigger impact on your score.\n\nEach accessibility audit is pass or fail. Unlike the Performance audits, a page doesn't get points for partially passing an accessibility audit. For example, if some elements have screenreader-friendly names, but others don't, that page gets a 0 for the screenreader-friendly-names audit.",
       "format": "none",
       "gauge": {
@@ -784,11 +756,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "Lighthouse returns a Progressive Web App (PWA) score between 0 and 100. 0 is the worst possible score, and 100 is the best.\n\nThe PWA audits are based on the Baseline PWA Checklist, which lists 14 requirements. Lighthouse has automated audits for 11 of the 14 requirements. The remaining 3 can only be tested manually. Each of the 11 automated PWA audits are weighted equally, so each one contributes approximately 9 points to your PWA score.",
       "format": "none",
       "gauge": {
@@ -880,11 +848,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "Search Engine Optimization Score",
       "format": "none",
       "gauge": {
@@ -977,11 +941,7 @@
       "colorPostfix": false,
       "colorPrefix": false,
       "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#299c46"
-      ],
+      "colors": ["#d44a3a", "rgba(237, 129, 40, 0.89)", "#299c46"],
       "description": "Lighthouse returns a Best Practices score between 0 and 100. 0 is the worst possible score, and 100 is the best.\n\nThe Best Practices audits are equally weighted. To calculate how much each audit contributes to your overall Best Practices score, count the number of Best Practices audits, then divide 100 by that number.",
       "format": "none",
       "gauge": {
@@ -1179,6 +1139,55 @@
               "intervalFactor": 1,
               "legendFormat": "JS Bootup Time",
               "refId": "G"
+            },
+            {
+              "expr": "pagespeed_lighthouse_largest_contentful_paint_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Largest Contentful Paint",
+              "refId": "H"
+            },
+            {
+              "expr": "pagespeed_lighthouse_mainthread_work_breakdown_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Mainthread Work",
+              "refId": "I"
+            },
+            {
+              "expr": "pagespeed_lighthouse_cumulative_layout_shift_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Cumulative Layout Shift",
+              "refId": "J"
+            },
+            {
+              "expr": "pagespeed_lighthouse_total_blocking_time_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Total Blacking Time",
+              "refId": "K"
+            },
+            {
+              "expr": "pagespeed_lighthouse_server_response_time_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Server Response Time",
+              "refId": "L"
+            },
+            {
+              "expr": "pagespeed_lighthouse_max_potential_fid_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Max Potential FID",
+              "refId": "M"
+            },
+            {
+              "expr": "pagespeed_lighthouse_estimated_input_latency_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Estimated Input Latency",
+              "refId": "N"
             }
           ],
           "thresholds": [],
@@ -1319,6 +1328,55 @@
               "intervalFactor": 1,
               "legendFormat": "JS Bootup Time",
               "refId": "G"
+            },
+            {
+              "expr": "delta(pagespeed_lighthouse_largest_contentful_paint_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Largest Contentful Paint",
+              "refId": "H"
+            },
+            {
+              "expr": "delta(pagespeed_lighthouse_mainthread_work_breakdown_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Mainthread Work",
+              "refId": "I"
+            },
+            {
+              "expr": "delta(pagespeed_lighthouse_cumulative_layout_shift_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Cumulative Layout Shift",
+              "refId": "J"
+            },
+            {
+              "expr": "delta(pagespeed_lighthouse_total_blocking_time_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Total Blacking Time",
+              "refId": "K"
+            },
+            {
+              "expr": "delta(pagespeed_lighthouse_server_response_time_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Server Response Time",
+              "refId": "L"
+            },
+            {
+              "expr": "delta(pagespeed_lighthouse_max_potential_fid_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Max Potential FID",
+              "refId": "M"
+            },
+            {
+              "expr": "delta(pagespeed_lighthouse_estimated_input_latency_duration_seconds{host=\"$host\",path=\"$path\",strategy=\"$strategy\"}[$diff])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Estimated Input Latency",
+              "refId": "N"
             }
           ],
           "thresholds": [],
@@ -2682,10 +2740,7 @@
         "allValue": "all",
         "current": {
           "text": "desktop + mobile",
-          "value": [
-            "desktop",
-            "mobile"
-          ]
+          "value": ["desktop", "mobile"]
         },
         "datasource": "prometheus",
         "definition": "",
@@ -2768,17 +2823,7 @@
       "2h",
       "1d"
     ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
   },
   "timezone": "",
   "title": "Pagespeed",
