@@ -18,7 +18,7 @@ import (
 const (
 	DefaultTimeoutDuration  = 30 * time.Second
 	DefaultTimeOffset       = 500 * time.Millisecond // To Allow For Processing Time
-	PrometheusTimeoutHeader = "X-Prometheus-ScrapeResult-Timeout-Seconds"
+	PrometheusTimeoutHeader = "X-Prometheus-Scrape-Timeout-Seconds"
 )
 
 type httpProbeHandler struct {
