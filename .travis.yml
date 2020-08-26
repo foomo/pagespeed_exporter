@@ -1,6 +1,6 @@
 language: go
 go:
-  - 1.14.x
+  - latest
 
 env:
   - GO111MODULE=on
@@ -15,6 +15,3 @@ services:
 
 script:
   - make
-  - if [[ -n "${TRAVIS_TAG}" ]]; then
-    make release;
-    fi
