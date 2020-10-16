@@ -23,17 +23,13 @@ service:
   type: ClusterIP
   port: 80
   annotations:
-    prometheus.io/scrape: "true"
+  # Careful, the http calls will need to occur within the prometheus timeout threshold
+  # This is not required for a CronJob that pushes to a gateway
+    prometheus.io/scrape: "false"
 
 targetPort: 9271
 
 resources: {}
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 3
-  targetCPUUtilizationPercentage: 80
 
 nodeSelector: {}
 
