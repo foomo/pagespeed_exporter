@@ -177,10 +177,14 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 
 	for k, v := range lhr.Audits {
 		re := regexp.MustCompile(`(\d*[.]?\d+(ms|s))|0`)
+		timeRe := regexp.MustCompile(`(ms|s)`)
 
 		if timeAuditMetrics[k] {
 			displayValue := strings.Replace(v.DisplayValue, "\u00a0", "", -1)
 			displayValue = strings.Replace(displayValue, ",", "", -1)
+			if !timeRe.MatchString(displayValue) {
+				displayValue = displayValue + "s"
+			}
 
 			if duration, errDuration := time.ParseDuration(re.FindString(displayValue)); errDuration == nil {
 				ch <- prometheus.MustNewConstMetric(
