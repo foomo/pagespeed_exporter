@@ -37,7 +37,7 @@ func Test_PagespeedScrapeService(t *testing.T) {
 		t.Fatalf("newPagespeedScrapeService should not throw an error: %v", err)
 	}
 
-	scrapes, err := service.Scrape(true, CalculateScrapeRequests("http://example.com/"))
+	scrapes, err := service.Scrape(true, CalculateScrapeRequests([]string{"http://example.com/"}, nil))
 	if err != nil {
 		t.Fatal("scrape should not throw an error")
 	}

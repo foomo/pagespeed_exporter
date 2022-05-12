@@ -28,9 +28,10 @@ type httpProbeHandler struct {
 	collectorFactory collector.Factory
 	pushGatewayUrl   string
 	pushGatewayJob   string
+	categories       []string
 }
 
-func NewProbeHandler(credentialsFile string, apiKey string, parallel bool, factory collector.Factory, pushGatewayUrl string, pushGatewayJob string) http.Handler {
+func NewProbeHandler(credentialsFile string, apiKey string, parallel bool, factory collector.Factory, pushGatewayUrl string, pushGatewayJob string, categories []string) http.Handler {
 	return httpProbeHandler{
 		credentialsFile:  credentialsFile,
 		googleAPIKey:     apiKey,
@@ -38,6 +39,7 @@ func NewProbeHandler(credentialsFile string, apiKey string, parallel bool, facto
 		collectorFactory: factory,
 		pushGatewayUrl:   pushGatewayUrl,
 		pushGatewayJob:   pushGatewayJob,
+		categories:       categories,
 	}
 }
 
@@ -50,7 +52,7 @@ func (ph httpProbeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.WithField("target", target).Info("probe requested for target")
 	}
 
-	requests := collector.CalculateScrapeRequests(targets...)
+	requests := collector.CalculateScrapeRequests(targets, ph.categories)
 	if len(requests) == 0 {
 		http.Error(w, "Probe requires at least one target", http.StatusBadRequest)
 		return
