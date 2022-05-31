@@ -2,16 +2,16 @@ package collector
 
 import (
 	"context"
+	"net/http"
+	"runtime"
+	"time"
+
 	"github.com/gammazero/workerpool"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
-	"google.golang.org/api/googleapi/transport"
 	"google.golang.org/api/option"
 	"google.golang.org/api/pagespeedonline/v5"
-	"net/http"
-	"runtime"
-	"time"
 )
 
 var _ scrapeService = &pagespeedScrapeService{}
@@ -22,8 +22,7 @@ type scrapeService interface {
 
 // newPagespeedScrapeService creates a new HTTP client service for pagespeed.
 // If the client timeout is set to 0 there will be no timeout
-func newPagespeedScrapeService(clientTimeout time.Duration, googleApiKey string) scrapeService {
-
+func newPagespeedScrapeService(clientTimeout time.Duration, options ...option.ClientOption) scrapeService {
 	client := &http.Client{
 		Transport: http.DefaultTransport,
 	}
@@ -32,17 +31,15 @@ func newPagespeedScrapeService(clientTimeout time.Duration, googleApiKey string)
 		client.Timeout = clientTimeout
 	}
 
-	if googleApiKey != "" {
-		client.Transport = &transport.APIKey{Key: googleApiKey}
-	}
-
 	return &pagespeedScrapeService{
 		scrapeClient: client,
+		options:      options,
 	}
 }
 
 type pagespeedScrapeService struct {
 	scrapeClient *http.Client
+	options      []option.ClientOption
 }
 
 func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeRequest) (scrapes []*ScrapeResult, err error) {
@@ -86,7 +83,14 @@ func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeReques
 }
 
 func (pss pagespeedScrapeService) scrape(request ScrapeRequest) (scrape *ScrapeResult, err error) {
-	service, err := pagespeedonline.NewService(context.Background(), option.WithHTTPClient(pss.scrapeClient))
+	opts := []option.ClientOption{
+		option.WithHTTPClient(pss.scrapeClient),
+	}
+	opts = append(opts, pss.options...)
+	service, err := pagespeedonline.NewService(
+		context.Background(),
+		opts...,
+	)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize pagespeed service")
 	}

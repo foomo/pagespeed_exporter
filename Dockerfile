@@ -35,7 +35,7 @@ MAINTAINER  Stefan Martinov <stefan.martinov@bestbytes.com>
 COPY --from=builder /pagespeed_exporter /bin/pagespeed_exporter
 
 RUN apk update \
-    && apk --no-cache add ca-certificates
+  && apk --no-cache add ca-certificates
 
 EXPOSE      9271
 

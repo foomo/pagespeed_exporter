@@ -2,9 +2,10 @@ package collector
 
 import (
 	"encoding/json"
-	"google.golang.org/api/pagespeedonline/v5"
 	"net/url"
 	"time"
+
+	"google.golang.org/api/pagespeedonline/v5"
 )
 
 const (
@@ -50,10 +51,11 @@ func (sr ScrapeRequest) IsValid() bool {
 }
 
 type Config struct {
-	ScrapeRequests []ScrapeRequest
-	GoogleAPIKey   string
-	Parallel       bool
-	ScrapeTimeout  time.Duration
+	ScrapeRequests  []ScrapeRequest
+	GoogleAPIKey    string
+	CredentialsFile string
+	Parallel        bool
+	ScrapeTimeout   time.Duration
 }
 
 func CalculateScrapeRequests(targets ...string) []ScrapeRequest {
