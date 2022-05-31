@@ -10,8 +10,6 @@ services:
     restart: unless-stopped
     ports:
       - "9271:9271"
-    #command:
-    # - "-api-key=${MY_API_KEY}"
 
   prometheus:
     restart: unless-stopped

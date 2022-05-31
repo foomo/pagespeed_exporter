@@ -10,7 +10,7 @@ func Test_PagespeedScrapeService(t *testing.T) {
 		t.Skip("skipping testing in short mode")
 	}
 
-	service := newPagespeedScrapeService(30*time.Second, "")
+	service := newPagespeedScrapeService(30 * time.Second)
 	scrapes, err := service.Scrape(false, CalculateScrapeRequests("http://example.com/"))
 	if err != nil {
 		t.Fatal("scrape should not throw an error")

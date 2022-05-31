@@ -10,6 +10,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/api/option"
 	"google.golang.org/api/pagespeedonline/v5"
 )
 
@@ -55,9 +56,18 @@ var timeAuditMetrics = map[string]bool{
 }
 
 func newCollector(config Config) (coll prometheus.Collector, err error) {
+	var options []option.ClientOption
+	if config.GoogleAPIKey != "" {
+		options = append(options, option.WithAPIKey(config.GoogleAPIKey))
+	}
+
+	if config.CredentialsFile != "" {
+		options = append(options, option.WithCredentialsFile(config.CredentialsFile))
+	}
+
 	return collector{
 		requests:      config.ScrapeRequests,
-		scrapeService: newPagespeedScrapeService(config.ScrapeTimeout, config.GoogleAPIKey),
+		scrapeService: newPagespeedScrapeService(config.ScrapeTimeout, options...),
 		parallel:      config.Parallel,
 	}, nil
 }

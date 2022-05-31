@@ -22,6 +22,7 @@ const (
 )
 
 type httpProbeHandler struct {
+	credentialsFile  string
 	googleAPIKey     string
 	parallel         bool
 	collectorFactory collector.Factory
@@ -29,8 +30,9 @@ type httpProbeHandler struct {
 	pushGatewayJob   string
 }
 
-func NewProbeHandler(apiKey string, parallel bool, factory collector.Factory, pushGatewayUrl string, pushGatewayJob string) http.Handler {
+func NewProbeHandler(credentialsFile string, apiKey string, parallel bool, factory collector.Factory, pushGatewayUrl string, pushGatewayJob string) http.Handler {
 	return httpProbeHandler{
+		credentialsFile:  credentialsFile,
 		googleAPIKey:     apiKey,
 		parallel:         parallel,
 		collectorFactory: factory,
@@ -68,10 +70,11 @@ func (ph httpProbeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	registry := prometheus.NewRegistry()
 
 	psc, err := ph.collectorFactory.Create(collector.Config{
-		ScrapeRequests: requests,
-		GoogleAPIKey:   ph.googleAPIKey,
-		Parallel:       ph.parallel,
-		ScrapeTimeout:  timeout,
+		ScrapeRequests:  requests,
+		CredentialsFile: ph.credentialsFile,
+		GoogleAPIKey:    ph.googleAPIKey,
+		Parallel:        ph.parallel,
+		ScrapeTimeout:   timeout,
 	})
 	if err != nil {
 		errResponse(w, "Could not initialize pagespeed collectors", err)

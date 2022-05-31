@@ -15,16 +15,15 @@ import (
 )
 
 var (
+	Version string
+
+	credentialsFile string
 	googleApiKey    string
 	listenerAddress string
 	targets         arrayFlags
 	parallel        bool
 	pushGatewayUrl  string
 	pushGatewayJob  string
-)
-
-var (
-	Version string
 )
 
 type arrayFlags []string
@@ -49,9 +48,10 @@ func main() {
 		requests := collector.CalculateScrapeRequests(targets...)
 
 		psc, errCollector := collectorFactory.Create(collector.Config{
-			ScrapeRequests: requests,
-			GoogleAPIKey:   googleApiKey,
-			Parallel:       parallel,
+			ScrapeRequests:  requests,
+			GoogleAPIKey:    googleApiKey,
+			CredentialsFile: credentialsFile,
+			Parallel:        parallel,
 		})
 		if errCollector != nil {
 			log.WithError(errCollector).Fatal("could not instantiate collector")
@@ -62,7 +62,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/", handler.NewIndexHandler())
 	mux.Handle("/metrics", promhttp.Handler())
-	mux.Handle("/probe", handler.NewProbeHandler(googleApiKey, parallel, collectorFactory, pushGatewayUrl, pushGatewayJob))
+	mux.Handle("/probe", handler.NewProbeHandler(credentialsFile, googleApiKey, parallel, collectorFactory, pushGatewayUrl, pushGatewayJob))
 
 	server := http.Server{
 		Addr:    listenerAddress,
@@ -74,6 +74,7 @@ func main() {
 
 func parseFlags() {
 	flag.StringVar(&googleApiKey, "api-key", getenv("PAGESPEED_API_KEY", ""), "sets the google API key used for pagespeed")
+	flag.StringVar(&credentialsFile, "credentials-file", getenv("PAGESPEED_CREDENTIALS_FILE", ""), "sets the location of the credentials file used for pagespeed")
 	flag.StringVar(&listenerAddress, "listener", getenv("PAGESPEED_LISTENER", ":9271"), "sets the listener address for the exporters")
 	flag.BoolVar(&parallel, "parallel", getenv("PAGESPEED_PARALLEL", "false") == "true", "forces parallel execution for pagespeed")
 	flag.StringVar(&pushGatewayUrl, "pushGatewayUrl", getenv("PUSHGATEWAY_URL", ""), "sets the push gateway to send the metrics. leave empty to ignore it")
