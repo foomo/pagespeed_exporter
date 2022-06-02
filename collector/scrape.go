@@ -12,6 +12,7 @@ import (
 	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
 	"google.golang.org/api/pagespeedonline/v5"
+	googlehttp "google.golang.org/api/transport/http"
 )
 
 var _ scrapeService = &pagespeedScrapeService{}
@@ -22,9 +23,14 @@ type scrapeService interface {
 
 // newPagespeedScrapeService creates a new HTTP client service for pagespeed.
 // If the client timeout is set to 0 there will be no timeout
-func newPagespeedScrapeService(clientTimeout time.Duration, options ...option.ClientOption) scrapeService {
+func newPagespeedScrapeService(clientTimeout time.Duration, options ...option.ClientOption) (scrapeService, error) {
+	transport, err := googlehttp.NewTransport(context.Background(), http.DefaultTransport, options...)
+	if err != nil {
+		return nil, err
+	}
+
 	client := &http.Client{
-		Transport: http.DefaultTransport,
+		Transport: transport,
 	}
 
 	if clientTimeout != 0 {
@@ -34,7 +40,7 @@ func newPagespeedScrapeService(clientTimeout time.Duration, options ...option.Cl
 	return &pagespeedScrapeService{
 		scrapeClient: client,
 		options:      options,
-	}
+	}, nil
 }
 
 type pagespeedScrapeService struct {
