@@ -65,9 +65,14 @@ func newCollector(config Config) (coll prometheus.Collector, err error) {
 		options = append(options, option.WithCredentialsFile(config.CredentialsFile))
 	}
 
+	svc, err := newPagespeedScrapeService(config.ScrapeTimeout, options...)
+	if err != nil {
+		return nil, err
+	}
+
 	return collector{
 		requests:      config.ScrapeRequests,
-		scrapeService: newPagespeedScrapeService(config.ScrapeTimeout, options...),
+		scrapeService: svc,
 		parallel:      config.Parallel,
 	}, nil
 }
