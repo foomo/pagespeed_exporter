@@ -21,7 +21,8 @@ COPY . ./
 FROM base as builder
 MAINTAINER  Stefan Martinov <stefan.martinov@bestbytes.com>
 
-RUN go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o /pagespeed_exporter pagespeed_exporter.go
+RUN GOARCH=amd64 GOOS=linux CGO_ENABLED=0 \
+    go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o /pagespeed_exporter pagespeed_exporter.go
 
 # strip and compress the binary
 RUN upx /pagespeed_exporter
