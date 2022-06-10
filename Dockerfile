@@ -4,7 +4,7 @@
 FROM golang:alpine as base
 MAINTAINER  Stefan Martinov <stefan.martinov@bestbytes.com>
 
-RUN apk add --no-cache git make bash upx \
+RUN apk add --no-cache git \
   && rm -rf /var/cache/apk/*
 
 WORKDIR /app
@@ -24,8 +24,6 @@ MAINTAINER  Stefan Martinov <stefan.martinov@bestbytes.com>
 RUN GOARCH=amd64 GOOS=linux CGO_ENABLED=0 \
     go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o /pagespeed_exporter pagespeed_exporter.go
 
-# strip and compress the binary
-RUN upx /pagespeed_exporter
 
 ##############################
 ###### STAGE: PACKAGE   ######
