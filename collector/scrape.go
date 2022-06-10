@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 	"runtime"
+	"sync"
 	"time"
 
-	"github.com/gammazero/workerpool"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -55,29 +55,39 @@ func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeReques
 		maxWorkers = runtime.NumCPU()
 	}
 
-	wp := workerpool.New(maxWorkers)
-
 	results := make(chan *ScrapeResult, 2*len(requests))
 
-	for _, req := range requests {
-		request := req
-		wp.Submit(func() {
+	// Fill queue with scrape requests
+	requestChan := make(chan ScrapeRequest)
+	go func() {
+		for _, r := range requests {
+			requestChan <- r
+		}
+		close(requestChan)
+	}()
 
-			scrape, err := pss.scrape(request)
-			if err != nil {
-				log.WithError(err).
-					WithFields(log.Fields{
-						"target":   request.Url,
-						"strategy": request.Strategy,
-					}).Warn("target scraping returned an error")
-				return
+	wg := sync.WaitGroup{}
+	wg.Add(maxWorkers)
+
+	for i := 0; i < maxWorkers; i++ {
+		go func() {
+			defer wg.Done()
+			for request := range requestChan {
+				scrape, err := pss.scrape(request)
+				if err != nil {
+					log.WithError(err).
+						WithFields(log.Fields{
+							"target":   request.Url,
+							"strategy": request.Strategy,
+						}).Warn("target scraping returned an error")
+					continue
+				}
+				results <- scrape
 			}
-			results <- scrape
-		})
-
+		}()
 	}
 
-	wp.StopWait()
+	wg.Wait()
 	close(results)
 
 	// Drain the channel after receiving all the results
