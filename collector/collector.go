@@ -18,6 +18,11 @@ var (
 	_ Factory = factory{}
 )
 
+var (
+	timeValueRe = regexp.MustCompile(`(\d*[.]?\d+(ms|s))|0`)
+	timeUnitRe  = regexp.MustCompile(`(ms|s)`)
+)
+
 type Factory interface {
 	Create(config Config) (prometheus.Collector, error)
 }
@@ -124,7 +129,7 @@ func collect(scrape *ScrapeResult, ch chan<- prometheus.Metric) error {
 	}
 
 	if r.LighthouseResult != nil {
-		collectLighthouseResults("lighthouse", r.LighthouseResult, constLabels, ch)
+		collectLighthouseResults("lighthouse", scrape.Request.Categories, r.LighthouseResult, constLabels, ch)
 	}
 	return nil
 }
@@ -162,7 +167,7 @@ func collectLoadingExperience(prefix string, lexp *pagespeedonline.PagespeedApiL
 
 }
 
-func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResultV5, constLabels prometheus.Labels, ch chan<- prometheus.Metric) {
+func collectLighthouseResults(prefix string, cats []string, lhr *pagespeedonline.LighthouseResultV5, constLabels prometheus.Labels, ch chan<- prometheus.Metric) {
 
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc(fqname(prefix, "total_duration_seconds"), "The total time spent in seconds loading the page and evaluating audits.", nil, constLabels),
@@ -170,16 +175,17 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 		lhr.Timing.Total/1000) //ms -> seconds
 
 	categories := map[string]*pagespeedonline.LighthouseCategoryV5{
-		"performance":    lhr.Categories.Performance,
-		"accessibility":  lhr.Categories.Accessibility,
-		"pwa":            lhr.Categories.Pwa,
-		"best-practices": lhr.Categories.BestPractices,
-		"seo":            lhr.Categories.Seo,
+		CategoryPerformance:   lhr.Categories.Performance,
+		CategoryAccessibility: lhr.Categories.Accessibility,
+		CategoryPWA:           lhr.Categories.Pwa,
+		CategoryBestPractices: lhr.Categories.BestPractices,
+		CategorySEO:           lhr.Categories.Seo,
 	}
 
-	for k, v := range categories {
-		score, err := strconv.ParseFloat(fmt.Sprint(v.Score), 64)
+	for _, c := range cats {
+		score, err := strconv.ParseFloat(fmt.Sprint(categories[c].Score), 64)
 		if err != nil {
+			logrus.WithError(err).Warn("could not parse category score")
 			continue
 		}
 
@@ -187,21 +193,18 @@ func collectLighthouseResults(prefix string, lhr *pagespeedonline.LighthouseResu
 			prometheus.NewDesc(fqname(prefix, "category_score"), "Lighthouse score for the specified category", []string{"category"}, constLabels),
 			prometheus.GaugeValue,
 			score,
-			k)
+			c)
 	}
 
 	for k, v := range lhr.Audits {
-		re := regexp.MustCompile(`(\d*[.]?\d+(ms|s))|0`)
-		timeRe := regexp.MustCompile(`(ms|s)`)
-
 		if timeAuditMetrics[k] {
 			displayValue := strings.Replace(v.DisplayValue, "\u00a0", "", -1)
 			displayValue = strings.Replace(displayValue, ",", "", -1)
-			if !timeRe.MatchString(displayValue) {
+			if !timeUnitRe.MatchString(displayValue) {
 				displayValue = displayValue + "s"
 			}
 
-			if duration, errDuration := time.ParseDuration(re.FindString(displayValue)); errDuration == nil {
+			if duration, errDuration := time.ParseDuration(timeValueRe.FindString(displayValue)); errDuration == nil {
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc(fqname(prefix, k, "duration_seconds"), v.Description, nil, constLabels),
 					prometheus.GaugeValue,

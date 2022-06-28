@@ -112,7 +112,7 @@ func (pss pagespeedScrapeService) scrape(request ScrapeRequest) (scrape *ScrapeR
 	}
 
 	call := service.Pagespeedapi.Runpagespeed(request.Url)
-	call.Category("performance", "seo", "pwa", "best-practices", "accessibility")
+	call.Category(request.Categories...)
 	call.Strategy(string(request.Strategy))
 
 	if request.Campaign != "" {
