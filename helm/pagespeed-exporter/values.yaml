@@ -2,7 +2,7 @@ image:
   name: pagespeed_exporter
   repository: foomo/pagespeed_exporter
   pullPolicy: Always
-  tag: ""
+  tag: 2.1.6
 
 imagePullSecrets: []
 nameOverride: ""
