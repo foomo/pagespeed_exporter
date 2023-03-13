@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # Builder Base
 # -----------------------------------------------------------------------------
-FROM golang:alpine as base
+FROM --platform=$BUILDPLATFORM golang:alpine as base
 MAINTAINER  Stefan Martinov <stefan.martinov@bestbytes.com>
 
 RUN apk add --no-cache git make bash upx \
@@ -21,7 +21,10 @@ COPY . ./
 FROM base as builder
 MAINTAINER  Stefan Martinov <stefan.martinov@bestbytes.com>
 
-RUN GOARCH=amd64 GOOS=linux CGO_ENABLED=0 \
+ARG TARGETOS
+ARG TARGETARCH
+
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 \
     go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o /pagespeed_exporter pagespeed_exporter.go
 
 # strip and compress the binary
