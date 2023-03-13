@@ -27,9 +27,6 @@ ARG TARGETARCH
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 \
     go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o /pagespeed_exporter pagespeed_exporter.go
 
-# strip and compress the binary
-RUN upx /pagespeed_exporter
-
 ##############################
 ###### STAGE: PACKAGE   ######
 ##############################
