@@ -18,7 +18,7 @@ The provided dashboard (Pagespeed) will be loaded with data after the first scra
 
 ![Dashboard](https://github.com/foomo/pagespeed_exporter/raw/assets/dashboard.png?raw=true)
 
-The  dashboard can be found at [grafana](https://grafana.com/dashboards/9510)
+The  dashboard can be found at [grafana](https://grafana.com/grafana/dashboards/9510-pagespeed/)
 
 Note: The example dashboard assumes you're fetching all pagespeed categories.
 
