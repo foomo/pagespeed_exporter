@@ -172,7 +172,7 @@ func collectLighthouseResults(prefix string, cats []string, lhr *pagespeedonline
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc(fqname(prefix, "total_duration_seconds"), "The total time spent in seconds loading the page and evaluating audits.", nil, constLabels),
 		prometheus.GaugeValue,
-		lhr.Timing.Total/1000) //ms -> seconds
+		lhr.Timing.Total/1000) // ms -> seconds
 
 	categories := map[string]*pagespeedonline.LighthouseCategoryV5{
 		CategoryPerformance:   lhr.Categories.Performance,
@@ -183,17 +183,19 @@ func collectLighthouseResults(prefix string, cats []string, lhr *pagespeedonline
 	}
 
 	for _, c := range cats {
-		score, err := strconv.ParseFloat(fmt.Sprint(categories[c].Score), 64)
-		if err != nil {
-			logrus.WithError(err).Warn("could not parse category score")
-			continue
-		}
+		if categories[c] != nil {
+			score, err := strconv.ParseFloat(fmt.Sprint(categories[c].Score), 64)
+			if err != nil {
+				logrus.WithError(err).Warn("could not parse category score")
+				continue
+			}
 
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(fqname(prefix, "category_score"), "Lighthouse score for the specified category", []string{"category"}, constLabels),
-			prometheus.GaugeValue,
-			score,
-			c)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc(fqname(prefix, "category_score"), "Lighthouse score for the specified category", []string{"category"}, constLabels),
+				prometheus.GaugeValue,
+				score,
+				c)
+		}
 	}
 
 	for k, v := range lhr.Audits {
