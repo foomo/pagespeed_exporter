@@ -62,9 +62,6 @@ jobs:
           GOOS=${{ matrix.platform.goos }} GOARCH=${{ matrix.platform.goarch }} go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o dist/pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
 
       - name: Upload binaries to release
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: dist/pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
-          asset_name: pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
-          asset_content_type: application/octet-stream
+          file: dist/pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
