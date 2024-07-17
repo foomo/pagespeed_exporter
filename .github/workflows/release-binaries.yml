@@ -58,7 +58,7 @@ jobs:
       - name: Build binaries
         run: |
           mkdir -p dist
-          FILENAME=pagespeed_exporter-${{ matrix.goos-goarch.goos }}-${{ matrix.goos-goarch.goarch }}
+          FILENAME=pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
           if [[ "${{ matrix.platform.goos }}" == "windows" ]]; then
             FILENAME=$FILENAME.exe
           fi
