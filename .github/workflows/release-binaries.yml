@@ -17,16 +17,13 @@ jobs:
           - { goos: dragonfly, goarch: amd64 }
           - { goos: freebsd, goarch: 386 }
           - { goos: freebsd, goarch: amd64 }
+          - { goos: freebsd, goarch: arm }
           - { goos: freebsd, goarch: arm64 }
-          - { goos: freebsd, goarch: armv6 }
-          - { goos: freebsd, goarch: armv7 }
           - { goos: illumos, goarch: amd64 }
           - { goos: linux, goarch: 386 }
           - { goos: linux, goarch: amd64 }
+          - { goos: linux, goarch: arm }
           - { goos: linux, goarch: arm64 }
-          - { goos: linux, goarch: armv5 }
-          - { goos: linux, goarch: armv6 }
-          - { goos: linux, goarch: armv7 }
           - { goos: linux, goarch: mips }
           - { goos: linux, goarch: mips64 }
           - { goos: linux, goarch: mips64le }
@@ -37,15 +34,17 @@ jobs:
           - { goos: linux, goarch: s390x }
           - { goos: netbsd, goarch: 386 }
           - { goos: netbsd, goarch: amd64 }
+          - { goos: netbsd, goarch: arm }
           - { goos: netbsd, goarch: arm64 }
-          - { goos: netbsd, goarch: armv6 }
-          - { goos: netbsd, goarch: armv7 }
           - { goos: openbsd, goarch: 386 }
           - { goos: openbsd, goarch: amd64 }
+          - { goos: openbsd, goarch: arm }
           - { goos: openbsd, goarch: arm64 }
-          - { goos: openbsd, goarch: armv7 }
+          - { goos: openbsd, goarch: mips64 }
+          - { goos: solaris, goarch: amd64 }
           - { goos: windows, goarch: 386 }
           - { goos: windows, goarch: amd64 }
+          - { goos: windows, goarch: arm }
           - { goos: windows, goarch: arm64 }
 
     steps:
