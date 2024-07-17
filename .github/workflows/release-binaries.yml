@@ -64,4 +64,4 @@ jobs:
       - name: Upload binaries to release
         uses: softprops/action-gh-release@v2
         with:
-          file: dist/pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
+          files: dist/pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
