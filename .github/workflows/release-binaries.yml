@@ -40,7 +40,6 @@ jobs:
           - { goos: openbsd, goarch: amd64 }
           - { goos: openbsd, goarch: arm }
           - { goos: openbsd, goarch: arm64 }
-          - { goos: openbsd, goarch: mips64 }
           - { goos: solaris, goarch: amd64 }
           - { goos: windows, goarch: 386 }
           - { goos: windows, goarch: amd64 }
@@ -59,6 +58,10 @@ jobs:
       - name: Build binaries
         run: |
           mkdir -p dist
+          FILENAME=pagespeed_exporter-${{ matrix.goos-goarch.goos }}-${{ matrix.goos-goarch.goarch }}
+          if [[ "${{ matrix.platform.goos }}" == "windows" ]]; then
+            FILENAME=$FILENAME.exe
+          fi
           GOOS=${{ matrix.platform.goos }} GOARCH=${{ matrix.platform.goarch }} go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o dist/pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
 
       - name: Upload binaries to release
