@@ -62,7 +62,7 @@ jobs:
           if [[ "${{ matrix.platform.goos }}" == "windows" ]]; then
             FILENAME=$FILENAME.exe
           fi
-          GOOS=${{ matrix.platform.goos }} GOARCH=${{ matrix.platform.goarch }} go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o dist/pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
+          GOOS=${{ matrix.platform.goos }} GOARCH=${{ matrix.platform.goarch }} go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o dist/$FILENAME
 
       - name: Upload binaries to release
         uses: softprops/action-gh-release@v2
