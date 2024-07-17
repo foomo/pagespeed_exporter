@@ -1,0 +1,71 @@
+name: Release binaries
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        platform:
+          - { goos: aix, goarch: ppc64 }
+          - { goos: darwin, goarch: amd64 }
+          - { goos: darwin, goarch: arm64 }
+          - { goos: dragonfly, goarch: amd64 }
+          - { goos: freebsd, goarch: 386 }
+          - { goos: freebsd, goarch: amd64 }
+          - { goos: freebsd, goarch: arm64 }
+          - { goos: freebsd, goarch: armv6 }
+          - { goos: freebsd, goarch: armv7 }
+          - { goos: illumos, goarch: amd64 }
+          - { goos: linux, goarch: 386 }
+          - { goos: linux, goarch: amd64 }
+          - { goos: linux, goarch: arm64 }
+          - { goos: linux, goarch: armv5 }
+          - { goos: linux, goarch: armv6 }
+          - { goos: linux, goarch: armv7 }
+          - { goos: linux, goarch: mips }
+          - { goos: linux, goarch: mips64 }
+          - { goos: linux, goarch: mips64le }
+          - { goos: linux, goarch: mipsle }
+          - { goos: linux, goarch: ppc64 }
+          - { goos: linux, goarch: ppc64le }
+          - { goos: linux, goarch: riscv64 }
+          - { goos: linux, goarch: s390x }
+          - { goos: netbsd, goarch: 386 }
+          - { goos: netbsd, goarch: amd64 }
+          - { goos: netbsd, goarch: arm64 }
+          - { goos: netbsd, goarch: armv6 }
+          - { goos: netbsd, goarch: armv7 }
+          - { goos: openbsd, goarch: 386 }
+          - { goos: openbsd, goarch: amd64 }
+          - { goos: openbsd, goarch: arm64 }
+          - { goos: openbsd, goarch: armv7 }
+          - { goos: windows, goarch: 386 }
+          - { goos: windows, goarch: amd64 }
+          - { goos: windows, goarch: arm64 }
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.19'
+
+      - name: Build binaries
+        run: |
+          mkdir -p dist
+          GOOS=${{ matrix.platform.goos }} GOARCH=${{ matrix.platform.goarch }} go build -ldflags "-X main.Version=`git rev-parse --short HEAD`" -o dist/pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
+
+      - name: Upload binaries to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: dist/pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
+          asset_name: pagespeed_exporter-${{ matrix.platform.goos }}-${{ matrix.platform.goarch }}
+          asset_content_type: application/octet-stream
