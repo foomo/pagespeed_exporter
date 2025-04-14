@@ -30,7 +30,8 @@ RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 \
 ##############################
 ###### STAGE: PACKAGE   ######
 ##############################
-FROM alpine:3.20.3
+FROM alpine:3.21.3
+
 LABEL maintainer="Stefan Martinov <stefan.martinov@bestbytes.com>"
 
 COPY --from=builder /pagespeed_exporter /bin/pagespeed_exporter
