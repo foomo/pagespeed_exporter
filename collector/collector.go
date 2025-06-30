@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/foomo/pagespeed_exporter/cache"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/option"
@@ -27,11 +28,12 @@ type Factory interface {
 	Create(config Config) (prometheus.Collector, error)
 }
 
-func NewFactory() Factory {
-	return factory{}
+func NewFactory(cache cache.ResultCache) Factory {
+	return factory{cache: cache}
 }
 
 type factory struct {
+	cache cache.ResultCache
 }
 
 type collector struct {
@@ -40,8 +42,8 @@ type collector struct {
 	parallel      bool
 }
 
-func (factory) Create(config Config) (prometheus.Collector, error) {
-	return newCollector(config)
+func (f factory) Create(config Config) (prometheus.Collector, error) {
+	return newCollector(config, f.cache)
 }
 
 var timeAuditMetrics = map[string]bool{
@@ -60,7 +62,7 @@ var timeAuditMetrics = map[string]bool{
 	"estimated-input-latency":   true,
 }
 
-func newCollector(config Config) (coll prometheus.Collector, err error) {
+func newCollector(config Config, cache cache.ResultCache) (coll prometheus.Collector, err error) {
 	var options []option.ClientOption
 	if config.GoogleAPIKey != "" {
 		options = append(options, option.WithAPIKey(config.GoogleAPIKey))
@@ -70,7 +72,7 @@ func newCollector(config Config) (coll prometheus.Collector, err error) {
 		options = append(options, option.WithCredentialsFile(config.CredentialsFile))
 	}
 
-	svc, err := newPagespeedScrapeService(config.ScrapeTimeout, options...)
+	svc, err := newPagespeedScrapeService(config.ScrapeTimeout, cache, options...)
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/foomo/pagespeed_exporter/cache"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -23,7 +24,7 @@ type scrapeService interface {
 
 // newPagespeedScrapeService creates a new HTTP client service for pagespeed.
 // If the client timeout is set to 0 there will be no timeout
-func newPagespeedScrapeService(clientTimeout time.Duration, options ...option.ClientOption) (scrapeService, error) {
+func newPagespeedScrapeService(clientTimeout time.Duration, cache cache.ResultCache, options ...option.ClientOption) (scrapeService, error) {
 	transport, err := googlehttp.NewTransport(context.Background(), http.DefaultTransport, options...)
 	if err != nil {
 		return nil, err
@@ -40,12 +41,14 @@ func newPagespeedScrapeService(clientTimeout time.Duration, options ...option.Cl
 	return &pagespeedScrapeService{
 		scrapeClient: client,
 		options:      options,
+		cache:        cache,
 	}, nil
 }
 
 type pagespeedScrapeService struct {
 	scrapeClient *http.Client
 	options      []option.ClientOption
+	cache        cache.ResultCache
 }
 
 func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeRequest) (scrapes []*ScrapeResult, err error) {
@@ -99,6 +102,31 @@ func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeReques
 }
 
 func (pss pagespeedScrapeService) scrape(request ScrapeRequest) (scrape *ScrapeResult, err error) {
+	// Generate cache key
+	cacheKey := cache.NewCacheKey(
+		request.Url,
+		string(request.Strategy),
+		request.Categories,
+		request.Locale,
+		request.Campaign,
+		request.Source,
+	)
+
+	// Check cache first
+	if pss.cache != nil {
+		if cachedResult, found := pss.cache.Get(cacheKey); found {
+			log.WithFields(log.Fields{
+				"url":      request.Url,
+				"strategy": request.Strategy,
+			}).Debug("cache hit")
+			return &ScrapeResult{
+				Request: request,
+				Result:  cachedResult,
+			}, nil
+		}
+	}
+
+	// Cache miss, proceed with API call
 	opts := []option.ClientOption{
 		option.WithHTTPClient(pss.scrapeClient),
 	}
@@ -132,6 +160,15 @@ func (pss pagespeedScrapeService) scrape(request ScrapeRequest) (scrape *ScrapeR
 	result, errResult := call.Do()
 	if errResult != nil {
 		return nil, errResult
+	}
+
+	// Store result in cache
+	if pss.cache != nil && result != nil {
+		pss.cache.Set(cacheKey, result)
+		log.WithFields(log.Fields{
+			"url":      request.Url,
+			"strategy": request.Strategy,
+		}).Debug("cached result")
 	}
 
 	return &ScrapeResult{

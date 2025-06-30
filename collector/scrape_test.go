@@ -32,7 +32,7 @@ func Test_PagespeedScrapeService(t *testing.T) {
 		t.Skip("skipping testing unless API key or credentials file is set")
 	}
 
-	service, err := newPagespeedScrapeService(30*time.Second, options...)
+	service, err := newPagespeedScrapeService(30*time.Second, nil, options...)
 	if err != nil {
 		t.Fatalf("newPagespeedScrapeService should not throw an error: %v", err)
 	}
