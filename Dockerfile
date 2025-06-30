@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # Builder Base
 # -----------------------------------------------------------------------------
-FROM --platform=$BUILDPLATFORM golang:alpine as base
+FROM --platform=$BUILDPLATFORM golang:alpine AS base
 LABEL maintainer="Stefan Martinov <stefan.martinov@bestbytes.com>"
 
 RUN apk add --no-cache git \
@@ -18,7 +18,7 @@ COPY . ./
 ##############################
 ###### STAGE: BUILD     ######
 ##############################
-FROM base as builder
+FROM base AS builder
 LABEL maintainer="Stefan Martinov <stefan.martinov@bestbytes.com>"
 
 ARG TARGETOS
@@ -30,7 +30,7 @@ RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 \
 ##############################
 ###### STAGE: PACKAGE   ######
 ##############################
-FROM alpine:3.21.3
+FROM alpine:latest
 
 LABEL maintainer="Stefan Martinov <stefan.martinov@bestbytes.com>"
 
