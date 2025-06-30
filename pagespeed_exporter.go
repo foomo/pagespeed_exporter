@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/foomo/pagespeed_exporter/cache"
 	"github.com/foomo/pagespeed_exporter/collector"
 	"github.com/foomo/pagespeed_exporter/handler"
 	"github.com/prometheus/client_golang/prometheus"
@@ -24,6 +26,7 @@ var (
 	parallel        bool
 	pushGatewayUrl  string
 	pushGatewayJob  string
+	cacheTTL        string
 )
 
 type arrayFlags []string
@@ -40,9 +43,29 @@ func (i *arrayFlags) Set(value string) error {
 func main() {
 	parseFlags()
 
+	// Parse cache TTL
+	var ttl time.Duration
+	if cacheTTL != "" {
+		var err error
+		ttl, err = time.ParseDuration(cacheTTL)
+		if err != nil {
+			log.WithError(err).Fatal("invalid cache TTL format")
+		}
+	} else {
+		ttl = 15 * time.Minute // Default 15 minutes
+	}
+
+	// Initialize cache
+	resultCache := cache.New(ttl)
+	if ttl > 0 {
+		log.Infof("cache enabled with TTL: %v", ttl)
+	} else {
+		log.Info("cache disabled")
+	}
+
 	log.Infof("starting pagespeed exporter version %s on address %s for %d targets and %d categories", Version, listenerAddress, len(targets), len(categories))
 
-	collectorFactory := collector.NewFactory()
+	collectorFactory := collector.NewFactory(resultCache)
 	// Register prometheus target collectors only if there is more than one target
 	if len(targets) > 0 {
 		requests := collector.CalculateScrapeRequests(targets, categories)
@@ -79,6 +102,7 @@ func parseFlags() {
 	flag.BoolVar(&parallel, "parallel", getenv("PAGESPEED_PARALLEL", "false") == "true", "forces parallel execution for pagespeed")
 	flag.StringVar(&pushGatewayUrl, "pushGatewayUrl", getenv("PUSHGATEWAY_URL", ""), "sets the push gateway to send the metrics. leave empty to ignore it")
 	flag.StringVar(&pushGatewayJob, "pushGatewayJob", getenv("PUSHGATEWAY_JOB", "pagespeed_exporter"), "sets push gateway job name")
+	flag.StringVar(&cacheTTL, "cache-ttl", getenv("PAGESPEED_CACHE_TTL", ""), "sets the cache TTL duration (e.g., '15m', '1h', '30s'). Default is 15m. Set to '0s' to disable cache")
 	targetsFlag := flag.String("targets", getenv("PAGESPEED_TARGETS", ""), "comma separated list of targets to measure")
 	categoriesFlag := flag.String("categories", getenv("PAGESPEED_CATEGORIES", "accessibility,best-practices,performance,pwa,seo"), "comma separated list of categories. overridden by categories in JSON targets")
 	flag.Var(&targets, "t", "multiple argument parameters")
