@@ -47,6 +47,9 @@ Instructions how to create a key for pagespeed can be found [here](https://devel
 
 ```sh
 $ pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus.io -listener :80
+
+# With custom cache TTL
+$ pagespeed_exporter -api-key {KEY} -targets https://google.com,https://prometheus.io -cache-ttl 30m
 ```
 
 ### Exporter Target Specification
@@ -82,20 +85,50 @@ Configuration specification in JSON and plain is supported both in command line 
 
 Configuration of targets can be done via docker and via prometheus
 
-| Flag             | Variable             | Description                                   | Default                                          | Required |
-|------------------|----------------------|-----------------------------------------------|--------------------------------------------------|----------|
-| -api-key         | PAGESPEED_API_KEY    | sets the google API key used for pagespeed    |                                                  | False    |
-| -targets         | PAGESPEED_TARGETS    | comma separated list of targets to measure    |                                                  | False    |
-| -categories      | PAGESPEED_CATEGORIES | comma separated list of categories to check   | accessibility,best-practices,performance,pwa,seo | False    |
-| -t               | NONE                 | multi-value target array (check docker comp)  |                                                  | False    |
-| -listener        | PAGESPEED_LISTENER   | sets the listener address for the exporters   | :9271                                            | False    |
-| -parallel        | PAGESPEED_PARALLEL   | sets the execution of targets to be parallel  | false                                            | False    |
-| -pushGatewayUrl  | PUSHGATEWAY_URL      | sets the pushgateway url to send the metrics  |                                                  | False    |
-| -pushGatewayJob  | PUSHGATEWAY_JOB      | sets the pushgateway job name                 | pagespeed_exporter                               | False    |
+| Flag             | Variable             | Description                                                              | Default                                          | Required |
+|------------------|----------------------|--------------------------------------------------------------------------|--------------------------------------------------|----------|
+| -api-key         | PAGESPEED_API_KEY    | sets the google API key used for pagespeed                             |                                                  | False    |
+| -targets         | PAGESPEED_TARGETS    | comma separated list of targets to measure                             |                                                  | False    |
+| -categories      | PAGESPEED_CATEGORIES | comma separated list of categories to check                            | accessibility,best-practices,performance,pwa,seo | False    |
+| -t               | NONE                 | multi-value target array (check docker comp)                           |                                                  | False    |
+| -listener        | PAGESPEED_LISTENER   | sets the listener address for the exporters                            | :9271                                            | False    |
+| -parallel        | PAGESPEED_PARALLEL   | sets the execution of targets to be parallel                           | false                                            | False    |
+| -cache-ttl       | PAGESPEED_CACHE_TTL  | sets the cache TTL duration (e.g., '15m', '1h', '30s'). Set to '0s' to disable cache | 15m                                | False    |
+| -pushGatewayUrl  | PUSHGATEWAY_URL      | sets the pushgateway url to send the metrics                           |                                                  | False    |
+| -pushGatewayJob  | PUSHGATEWAY_JOB      | sets the pushgateway job name                                          | pagespeed_exporter                               | False    |
 
 Note: google api key is required only if scraping more than 2 targets/second
 
 Note: exporter can be run without targets, and later targets provided via prometheus
+
+
+### Caching
+
+The exporter includes an in-memory cache to reduce API calls to Google PageSpeed Insights. This is particularly useful when:
+- Running frequent scrapes of the same targets
+- Using the probe endpoint repeatedly for the same URLs
+- Working within Google API rate limits
+
+#### How it works:
+- Results are cached based on the complete request configuration (URL, strategy, categories, locale, campaign, source)
+- Each cached entry has a configurable time-to-live (TTL)
+- Cache checks happen before making API calls
+- Successful API responses are automatically stored in cache
+
+#### Configuration:
+- Use the `-cache-ttl` flag or `PAGESPEED_CACHE_TTL` environment variable
+- Default TTL is 15 minutes
+- Format: Duration string (e.g., "15m", "1h", "30s")
+- To disable caching, set TTL to "0s"
+
+#### Example:
+```sh
+# Enable cache with 30-minute TTL
+$ pagespeed_exporter -api-key {KEY} -targets https://example.com -cache-ttl 30m
+
+# Disable cache
+$ pagespeed_exporter -api-key {KEY} -targets https://example.com -cache-ttl 0s
+```
 
 
 ### Pushing metrics via push gateway
@@ -145,6 +178,7 @@ $ docker run -p "9271:9271" --rm \
     --env PAGESPEED_API_KEY={KEY} \
     --env PAGESPEED_TARGETS=https://google.com,https://prometheus.io \
     --env PAGESPEED_CATEGORIES=accessibility,pwa \
+    --env PAGESPEED_CACHE_TTL=30m \
     foomo/pagespeed_exporter
 ```
 
