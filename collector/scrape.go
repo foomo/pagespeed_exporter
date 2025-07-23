@@ -23,7 +23,7 @@ type scrapeService interface {
 
 // newPagespeedScrapeService creates a new HTTP client service for pagespeed.
 // If the client timeout is set to 0 there will be no timeout
-func newPagespeedScrapeService(clientTimeout time.Duration, options ...option.ClientOption) (scrapeService, error) {
+func newPagespeedScrapeService(clientTimeout time.Duration, cacheTTL time.Duration, options ...option.ClientOption) (scrapeService, error) {
 	transport, err := googlehttp.NewTransport(context.Background(), http.DefaultTransport, options...)
 	if err != nil {
 		return nil, err
@@ -40,12 +40,14 @@ func newPagespeedScrapeService(clientTimeout time.Duration, options ...option.Cl
 	return &pagespeedScrapeService{
 		scrapeClient: client,
 		options:      options,
+		cache:        newScrapeCache(cacheTTL),
 	}, nil
 }
 
 type pagespeedScrapeService struct {
 	scrapeClient *http.Client
 	options      []option.ClientOption
+	cache        *scrapeCache
 }
 
 func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeRequest) (scrapes []*ScrapeResult, err error) {
@@ -99,6 +101,12 @@ func (pss *pagespeedScrapeService) Scrape(parallel bool, requests []ScrapeReques
 }
 
 func (pss pagespeedScrapeService) scrape(request ScrapeRequest) (scrape *ScrapeResult, err error) {
+	cacheKey := cacheKeyFromRequest(request)
+	if pss.cache != nil {
+		if cached, ok := pss.cache.get(cacheKey); ok {
+			return cached, nil
+		}
+	}
 	opts := []option.ClientOption{
 		option.WithHTTPClient(pss.scrapeClient),
 	}
@@ -134,8 +142,12 @@ func (pss pagespeedScrapeService) scrape(request ScrapeRequest) (scrape *ScrapeR
 		return nil, errResult
 	}
 
-	return &ScrapeResult{
+	scrapeResult := &ScrapeResult{
 		Request: request,
 		Result:  result,
-	}, nil
+	}
+	if pss.cache != nil {
+		pss.cache.set(cacheKey, scrapeResult)
+	}
+	return scrapeResult, nil
 }

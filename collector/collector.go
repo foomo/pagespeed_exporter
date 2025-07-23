@@ -70,7 +70,7 @@ func newCollector(config Config) (coll prometheus.Collector, err error) {
 		options = append(options, option.WithCredentialsFile(config.CredentialsFile))
 	}
 
-	svc, err := newPagespeedScrapeService(config.ScrapeTimeout, options...)
+	svc, err := newPagespeedScrapeService(config.ScrapeTimeout, config.CacheTTL, options...)
 	if err != nil {
 		return nil, err
 	}

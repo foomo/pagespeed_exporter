@@ -78,6 +78,7 @@ type Config struct {
 	CredentialsFile string
 	Parallel        bool
 	ScrapeTimeout   time.Duration
+	CacheTTL        time.Duration // cache duration, 0 disables cache
 }
 
 func CalculateScrapeRequests(targets, categories []string) []ScrapeRequest {
