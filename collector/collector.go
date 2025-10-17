@@ -47,7 +47,7 @@ func (factory) Create(config Config) (prometheus.Collector, error) {
 var timeAuditMetrics = map[string]bool{
 	"first-contentful-paint":    true,
 	"first-cpu-idle":            true,
-	"first-meaningful-paint":    true,
+	"first-meaningful-paint":    false,
 	"interactive":               true,
 	"speed-index":               true,
 	"bootup-time":               true,
