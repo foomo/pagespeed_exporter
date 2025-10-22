@@ -29,6 +29,71 @@ Note: The example dashboard assumes you're fetching all pagespeed categories.
 
 Prometheus exporter for google pagespeed metrics
 
+## CrUX Metrics (Real User Monitoring)
+
+The exporter provides Chrome User Experience Report (CrUX) metrics, which represent real-world user experience data collected from Chrome browsers. CrUX data is only available for URLs and origins with sufficient user traffic.
+
+### Metric Prefixes
+
+- `pagespeed_loading_experience_*` - URL-specific RUM data (when available for the specific page)
+- `pagespeed_origin_loading_experience_*` - Origin-wide RUM data (aggregated across the entire domain)
+
+### Available CrUX Metrics
+
+The exporter provides three types of metrics for each Core Web Vital:
+
+1. **P75 Percentile** - The 75th percentile value (75% of users experience better performance)
+2. **Category Ratios** - Proportion of users experiencing fast/average/slow performance
+3. **Thresholds** - Google's Core Web Vitals performance boundaries
+
+#### Core Web Vitals Included
+
+- **Largest Contentful Paint (LCP)** - Measures loading performance
+- **Interaction to Next Paint (INP)** - Measures interactivity
+- **Cumulative Layout Shift (CLS)** - Measures visual stability
+- **First Contentful Paint (FCP)** - Measures perceived load speed
+- **Experimental Time to First Byte (TTFB)** - Measures server responsiveness
+
+### Example Metrics Output
+
+For Largest Contentful Paint (LCP):
+
+```prometheus
+# P75 percentile (existing metric)
+pagespeed_loading_experience_metrics_largest_contentful_paint_duration_seconds 1.278
+
+# Category distribution ratios (proportion of users in each category)
+pagespeed_loading_experience_metrics_largest_contentful_paint_category_ratio{category="fast"} 0.9389
+pagespeed_loading_experience_metrics_largest_contentful_paint_category_ratio{category="average"} 0.0371
+pagespeed_loading_experience_metrics_largest_contentful_paint_category_ratio{category="slow"} 0.0240
+
+# Core Web Vitals thresholds
+pagespeed_loading_experience_metrics_largest_contentful_paint_threshold_duration_seconds{threshold="good"} 2.5
+pagespeed_loading_experience_metrics_largest_contentful_paint_threshold_duration_seconds{threshold="poor"} 4.0
+```
+
+The same pattern applies to INP, FCP, and TTFB. For CLS (which is unitless), the metrics omit the `_duration_seconds` suffix:
+
+```prometheus
+pagespeed_loading_experience_metrics_cumulative_layout_shift_score 0.0
+pagespeed_loading_experience_metrics_cumulative_layout_shift_score_category_ratio{category="fast"} 0.9994
+pagespeed_loading_experience_metrics_cumulative_layout_shift_score_threshold{threshold="good"} 0.1
+```
+
+### Performance Categories
+
+- **Fast** - Meets Google's "good" threshold (provides a good user experience)
+- **Average** - Between "good" and "poor" thresholds (needs improvement)
+- **Slow** - Exceeds "poor" threshold (provides a poor user experience)
+
+### Data Availability
+
+CrUX data is based on real user measurements from Chrome browsers over the last 28 days. Metrics will only be available for:
+- URLs with sufficient Chrome user traffic
+- Origins (domains) with sufficient Chrome user traffic
+
+If data is unavailable, the corresponding metrics will not be exported.
+
 
 ## Building And Running
 
