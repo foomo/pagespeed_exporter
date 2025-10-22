@@ -80,7 +80,7 @@ func parseFlags() {
 	flag.StringVar(&pushGatewayUrl, "pushGatewayUrl", getenv("PUSHGATEWAY_URL", ""), "sets the push gateway to send the metrics. leave empty to ignore it")
 	flag.StringVar(&pushGatewayJob, "pushGatewayJob", getenv("PUSHGATEWAY_JOB", "pagespeed_exporter"), "sets push gateway job name")
 	targetsFlag := flag.String("targets", getenv("PAGESPEED_TARGETS", ""), "comma separated list of targets to measure")
-	categoriesFlag := flag.String("categories", getenv("PAGESPEED_CATEGORIES", "accessibility,best-practices,performance,pwa,seo"), "comma separated list of categories. overridden by categories in JSON targets")
+	categoriesFlag := flag.String("categories", getenv("PAGESPEED_CATEGORIES", "accessibility,best-practices,performance,seo"), "comma separated list of categories. overridden by categories in JSON targets")
 	flag.Var(&targets, "t", "multiple argument parameters")
 	flag.Parse()
 

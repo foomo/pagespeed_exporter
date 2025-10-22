@@ -64,7 +64,7 @@ Or via JSON which adds additional parameters
 // URL can't be invalid
 // Strategy can only be mobile/desktop
 // If strategy is not specified, both desktop & mobile will be used
-// Categories can be any of accessibility/best-practices/performance/pwa/seo
+// Categories can be any of accessibility/best-practices/performance/seo
 // If categories are not specified, all categories will be used
 // Parameters are passed down to google pagespeed api
 
@@ -86,7 +86,7 @@ Configuration of targets can be done via docker and via prometheus
 |------------------|----------------------|-----------------------------------------------|--------------------------------------------------|----------|
 | -api-key         | PAGESPEED_API_KEY    | sets the google API key used for pagespeed    |                                                  | False    |
 | -targets         | PAGESPEED_TARGETS    | comma separated list of targets to measure    |                                                  | False    |
-| -categories      | PAGESPEED_CATEGORIES | comma separated list of categories to check   | accessibility,best-practices,performance,pwa,seo | False    |
+| -categories      | PAGESPEED_CATEGORIES | comma separated list of categories to check   | accessibility,best-practices,performance,seo | False    |
 | -t               | NONE                 | multi-value target array (check docker comp)  |                                                  | False    |
 | -listener        | PAGESPEED_LISTENER   | sets the listener address for the exporters   | :9271                                            | False    |
 | -parallel        | PAGESPEED_PARALLEL   | sets the execution of targets to be parallel  | false                                            | False    |
@@ -144,7 +144,7 @@ or
 $ docker run -p "9271:9271" --rm \
     --env PAGESPEED_API_KEY={KEY} \
     --env PAGESPEED_TARGETS=https://google.com,https://prometheus.io \
-    --env PAGESPEED_CATEGORIES=accessibility,pwa \
+    --env PAGESPEED_CATEGORIES=accessibility,seo \
     foomo/pagespeed_exporter
 ```
 

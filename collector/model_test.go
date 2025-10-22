@@ -7,7 +7,7 @@ import (
 )
 
 func TestCalculateScrapeRequests(t *testing.T) {
-	allCategories := []string{"accessibility", "best-practices", "performance", "pwa", "seo"}
+	allCategories := []string{"accessibility", "best-practices", "performance", "seo"}
 
 	tests := []struct {
 		name       string
@@ -27,9 +27,9 @@ func TestCalculateScrapeRequests(t *testing.T) {
 			{Url: "http://test2.com", Strategy: StrategyDesktop, Categories: allCategories},
 			{Url: "http://test2.com", Strategy: StrategyMobile, Categories: allCategories},
 		}},
-		{"single with categories", []string{"http://test.com"}, []string{"accessibility", "pwa"}, []ScrapeRequest{
-			{Url: "http://test.com", Strategy: StrategyDesktop, Categories: []string{"accessibility", "pwa"}},
-			{Url: "http://test.com", Strategy: StrategyMobile, Categories: []string{"accessibility", "pwa"}},
+		{"single with categories", []string{"http://test.com"}, []string{"accessibility", "seo"}, []ScrapeRequest{
+			{Url: "http://test.com", Strategy: StrategyDesktop, Categories: []string{"accessibility", "seo"}},
+			{Url: "http://test.com", Strategy: StrategyMobile, Categories: []string{"accessibility", "seo"}},
 		}},
 		{"multiple with categories", []string{"http://test.com", "http://test2.com"}, []string{"best-practices"}, []ScrapeRequest{
 			{Url: "http://test.com", Strategy: StrategyDesktop, Categories: []string{"best-practices"}},
@@ -51,14 +51,14 @@ func TestCalculateScrapeRequests(t *testing.T) {
 				},
 			}},
 		{"json with category",
-			[]string{`{"url":"http://test.com","strategy":"desktop","campaign":"campaign","source":"source","locale":"locale", "categories":["pwa"]}`}, nil, []ScrapeRequest{
+			[]string{`{"url":"http://test.com","strategy":"desktop","campaign":"campaign","source":"source","locale":"locale", "categories":["seo"]}`}, nil, []ScrapeRequest{
 				{
 					Url:        "http://test.com",
 					Strategy:   StrategyDesktop,
 					Campaign:   "campaign",
 					Source:     "source",
 					Locale:     "locale",
-					Categories: []string{"pwa"},
+					Categories: []string{"seo"},
 				},
 			}},
 		{"json with wrong category",
@@ -92,7 +92,7 @@ func TestCalculateScrapeRequests(t *testing.T) {
 }
 
 func TestPopulateCategories(t *testing.T) {
-	allCategories := []string{"accessibility", "best-practices", "performance", "pwa", "seo"}
+	allCategories := []string{"accessibility", "best-practices", "performance", "seo"}
 
 	tests := []struct {
 		msg  string
@@ -121,9 +121,9 @@ func TestPopulateCategories(t *testing.T) {
 		{
 			"input categories are set in request",
 			&ScrapeRequest{},
-			[]string{"best-practices", "pancake", "pwa"},
+			[]string{"best-practices", "pancake", "seo"},
 			&ScrapeRequest{
-				Categories: []string{"best-practices", "pancake", "pwa"},
+				Categories: []string{"best-practices", "pancake", "seo"},
 			},
 		},
 	}
