@@ -82,16 +82,17 @@ Configuration specification in JSON and plain is supported both in command line 
 
 Configuration of targets can be done via docker and via prometheus
 
-| Flag             | Variable             | Description                                   | Default                                          | Required |
-|------------------|----------------------|-----------------------------------------------|--------------------------------------------------|----------|
-| -api-key         | PAGESPEED_API_KEY    | sets the google API key used for pagespeed    |                                                  | False    |
-| -targets         | PAGESPEED_TARGETS    | comma separated list of targets to measure    |                                                  | False    |
-| -categories      | PAGESPEED_CATEGORIES | comma separated list of categories to check   | accessibility,best-practices,performance,seo | False    |
-| -t               | NONE                 | multi-value target array (check docker comp)  |                                                  | False    |
-| -listener        | PAGESPEED_LISTENER   | sets the listener address for the exporters   | :9271                                            | False    |
-| -parallel        | PAGESPEED_PARALLEL   | sets the execution of targets to be parallel  | false                                            | False    |
-| -pushGatewayUrl  | PUSHGATEWAY_URL      | sets the pushgateway url to send the metrics  |                                                  | False    |
-| -pushGatewayJob  | PUSHGATEWAY_JOB      | sets the pushgateway job name                 | pagespeed_exporter                               | False    |
+| Flag             | Variable             | Description                                                       | Default                                          | Required |
+|------------------|----------------------|-----------------------------------------------|----------------------------------------------------------------------|----------|
+| -api-key         | PAGESPEED_API_KEY    | sets the google API key used for pagespeed                        |                                                  | False    |
+| -targets         | PAGESPEED_TARGETS    | comma separated list of targets to measure                        |                                                  | False    |
+| -categories      | PAGESPEED_CATEGORIES | comma separated list of categories to check                       | accessibility,best-practices,performance,seo | False    |
+| -t               | NONE                 | multi-value target array (check docker comp)                      |                                                  | False    |
+| -listener        | PAGESPEED_LISTENER   | sets the listener address for the exporters                       | :9271                                            | False    |
+| -parallel        | PAGESPEED_PARALLEL   | sets the execution of targets to be parallel                      | false                                            | False    |
+| -pushGatewayUrl  | PUSHGATEWAY_URL      | sets the pushgateway url to send the metrics                      |                                                  | False    |
+| -pushGatewayJob  | PUSHGATEWAY_JOB      | sets the pushgateway job name                                     | pagespeed_exporter                               | False    |
+| -cache-ttl       | CACHE_TTL            | cache TTL for API results (e.g. 60s, 5m); disables cache if unset |                                                  | False    |
 
 Note: google api key is required only if scraping more than 2 targets/second
 

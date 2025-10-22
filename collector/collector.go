@@ -47,7 +47,7 @@ func (factory) Create(config Config) (prometheus.Collector, error) {
 var timeAuditMetrics = map[string]bool{
 	"first-contentful-paint":    true,
 	"first-cpu-idle":            true,
-	"first-meaningful-paint":    true,
+	"first-meaningful-paint":    false,
 	"interactive":               true,
 	"speed-index":               true,
 	"bootup-time":               true,
@@ -70,7 +70,7 @@ func newCollector(config Config) (coll prometheus.Collector, err error) {
 		options = append(options, option.WithCredentialsFile(config.CredentialsFile))
 	}
 
-	svc, err := newPagespeedScrapeService(config.ScrapeTimeout, options...)
+	svc, err := newPagespeedScrapeService(config.ScrapeTimeout, config.CacheTTL, options...)
 	if err != nil {
 		return nil, err
 	}
