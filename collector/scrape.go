@@ -110,7 +110,6 @@ func (pss pagespeedScrapeService) scrape(request ScrapeRequest) (scrape *ScrapeR
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize pagespeed service")
 	}
-
 	call := service.Pagespeedapi.Runpagespeed(request.Url)
 	call.Category(request.Categories...)
 	call.Strategy(string(request.Strategy))
