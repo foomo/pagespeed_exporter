@@ -15,7 +15,6 @@ const (
 	CategoryAccessibility = "accessibility"
 	CategoryBestPractices = "best-practices"
 	CategorySEO           = "seo"
-	CategoryPWA           = "pwa"
 	CategoryPerformance   = "performance"
 
 	Namespace = "pagespeed"
@@ -32,7 +31,6 @@ var availableCategories = map[string]bool{
 	CategoryAccessibility: true,
 	CategoryBestPractices: true,
 	CategorySEO:           true,
-	CategoryPWA:           true,
 	CategoryPerformance:   true,
 }
 
