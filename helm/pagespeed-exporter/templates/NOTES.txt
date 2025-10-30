@@ -10,6 +10,23 @@
   echo http://$SERVICE_IP:{{ .Values.service.port }}
 {{- else if contains "ClusterIP" .Values.service.type }}
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "pagespeed-exporter.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   echo "Visit http://127.0.0.1:8080 to use your application"
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:80
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+{{- end }}
+
+2. PageSpeed Exporter is now running and exposing metrics on port {{ .Values.service.port }}
+
+3. Prometheus should automatically discover and scrape the metrics if the annotations are configured correctly.
+
+{{- if .Values.args }}
+4. The exporter is configured with the following arguments:
+{{- range .Values.args }}
+   {{ . }}
+{{- end }}
+{{- else }}
+4. The exporter is running with default configuration. To specify targets, configure the 'args' value with:
+   args:
+     - "-targets"
+     - "https://example.com,https://google.com"
 {{- end }}

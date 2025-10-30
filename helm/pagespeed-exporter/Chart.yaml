@@ -1,5 +1,15 @@
-apiVersion: v1
-description: Pagespeed Exporter
+apiVersion: v2
 name: pagespeed-exporter
-version: 2.1.6
-appVersion: 2.1.6
+description: A Helm chart for deploying PageSpeed Exporter to monitor website performance metrics
+type: application
+version: 0.1.0
+appVersion: "3.1.2"
+keywords:
+  - monitoring
+  - prometheus
+  - pagespeed
+  - metrics
+maintainers:
+  - name: Infrastructure Team
+sources:
+  - https://github.com/foomo/pagespeed_exporter

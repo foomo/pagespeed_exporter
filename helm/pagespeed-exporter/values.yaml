@@ -1,8 +1,9 @@
+replicaCount: 1
+
 image:
-  name: pagespeed_exporter
   repository: foomo/pagespeed_exporter
-  pullPolicy: Always
-  tag: 2.1.6
+  pullPolicy: IfNotPresent
+  tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -14,20 +15,36 @@ serviceAccount:
   name: ""
 
 podAnnotations: {}
+# Additional pod annotations can be added here
 
-podSecurityContext: {}
+# Prometheus scrape annotations configuration
+# Note: Standard Prometheus only honors scrape, port, path, and scheme annotations.
+prometheus:
+  # Enable Prometheus scraping annotations
+  scrape: true
+  # Metrics path
+  path: "/metrics"
 
-securityContext: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
 
 service:
   type: ClusterIP
-  port: 80
-  annotations:
-  # Careful, the http calls will need to occur within the prometheus timeout threshold
-  # This is not required for a CronJob that pushes to a gateway
-    prometheus.io/scrape: "false"
-
-targetPort: 9271
+  port: 9271
+  targetPort: 9271  # This is the metrics port used throughout
+  annotations: {}
+  # Additional service annotations can be added here
 
 resources: {}
 
@@ -37,18 +54,62 @@ tolerations: []
 
 affinity: {}
 
-exporter:
-  googleapikey: ""
-  pushGatewayUrl: ""
-  targets: []
+# Name of the secret containing the API key
+# The secret must have a key named PAGESPEED_API_KEY
+secretName: pagespeed-configuration-secret
 
-cronjob:
-  enabled: false
-  image:
-    name: curl
-    repository: curlimages/curl
-    pullPolicy: Always
-    tag: 7.73.0
-  # Executes every 10 minutes
-  schedule: "*/10 * * * *"
-  scrapeTimeoutSeconds: 120
+# Simple configuration (will be converted to args)
+config:
+  # List of targets to monitor
+  targets: []
+  # Example:
+  # targets:
+  #   - https://www.example.com
+  #   - https://www.google.com
+
+  # Enable parallel execution
+  parallel: false
+
+  # Categories to check (leave empty for default: all categories)
+  categories: []
+  # Example:
+  # categories:
+  #   - performance
+  #   - seo
+  #   - accessibility
+
+  # Cache TTL for API results (e.g., "60s", "5m", "1h")
+  # Set to null or empty string to disable caching
+  cacheTTL: "60m"
+
+# Advanced: Raw command line arguments (overrides config above)
+# All available arguments from https://github.com/foomo/pagespeed_exporter
+args: []
+# Examples (uncomment and modify as needed):
+# args:
+#   # Comma separated list of targets to measure
+#   - "-targets=https://www.example.com,https://www.google.com"
+#
+#   # OR use multi-value target array (-t flag)
+#   # - "-t=https://www.example.com"
+#   # - "-t=https://www.google.com"
+#   # - "-t=https://www.github.com"
+#
+#   # Google API key (alternatively can be set via environment variable)
+#   # - "-api-key=your-api-key-here"
+#
+#   # Categories to check (default: accessibility,best-practices,performance,pwa,seo)
+#   # - "-categories=performance,seo,accessibility"
+#
+#   # Listener address (default: :9271)
+#   # - "-listener=:9271"
+#
+#   # Enable parallel execution (default: false)
+#   # - "-parallel=true"
+#
+#   # Push Gateway configuration
+#   # - "-pushGatewayUrl=http://prometheus-pushgateway:9091"
+#   # - "-pushGatewayJob=pagespeed_exporter"
+
+# Additional environment variables
+extraEnvVars: []

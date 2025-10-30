@@ -221,22 +221,26 @@ Check out the docker-compose folder
 
 ### Kubernetes/Helm
 
-You can install the included [Helm](https://docs.helm.sh/install/) chart to your k8s cluster with:
+Deploy PageSpeed Exporter to Kubernetes using the included [Helm](https://helm.sh/) chart. First, create a secret with your API key (only required if monitoring more than 2 targets/sec):
 
-```
-$ helm install helm/pagespeed-exporter
+```bash
+kubectl create secret generic pagespeed-configuration-secret \
+  --from-literal=PAGESPEED_API_KEY=your-api-key-here
 ```
 
-And then, to quickly test it:
-```
-$ kubectl get pods
-pagespeed-exporter-riotous-dragonfly-6b99955999-hj2kw   1/1     Running   0          1m
+Install the chart with your target URLs:
 
-$ kubectl exec -ti pagespeed-exporter-riotous-dragonfly-6b99955999-hj2kw -- sh
-# apk add curl
-# curl localhost:9271/metrics
-pagespeed_lighthouse_audit_score{audit="first-contentful-paint",host="https://www.google.com",path="/",strategy="mobile"} 1
-pagespeed_lighthouse_audit_score{audit="first-contentful-paint",host="https://www.google.com",path="/webhp",strategy="desktop"} 1
-pagespeed_lighthouse_audit_score{audit="first-contentful-paint",host="https://www.google.com",path="/webhp",strategy="mobile"} 1
-...
+```bash
+helm install pagespeed-exporter ./helm/pagespeed-exporter \
+  --set 'config.targets={https://www.example.com,https://www.yoursite.com}' \
+  --set config.parallel=true
 ```
+
+Test the deployment:
+
+```bash
+kubectl port-forward svc/pagespeed-exporter 9271:9271
+curl http://localhost:9271/metrics
+```
+
+For detailed configuration options, installation examples, and Prometheus integration, see the [Helm Chart README](helm/pagespeed-exporter/README.md).

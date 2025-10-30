@@ -160,76 +160,12 @@ func collectLoadingExperience(prefix string, lexp *pagespeedonline.PagespeedApiL
 	for k, v := range lexp.Metrics {
 		name := strings.TrimSuffix(strings.ToLower(k), "_ms")
 
-		// Export P75 percentile (existing metric - unchanged)
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc(fqname(prefix, "metrics", name, "duration_seconds"), "Percentile metrics for "+strings.Replace(name, "_", " ", -1), nil, constLables),
 			prometheus.GaugeValue,
 			float64(v.Percentile)/1000)
 
-		// Export category distribution ratios (NEW)
-		if len(v.Distributions) >= 3 {
-			categories := []string{"fast", "average", "slow"}
-			for i, dist := range v.Distributions {
-				if i >= 3 {
-					break
-				}
-				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc(fqname(prefix, "metrics", name, "category_ratio"), "Proportion of users experiencing "+categories[i]+" performance", []string{"category"}, constLables),
-					prometheus.GaugeValue,
-					dist.Proportion,
-					categories[i])
-			}
-		}
-
-		// Export Core Web Vitals thresholds (NEW)
-		if len(v.Distributions) >= 2 {
-			// Determine if this is CLS (uses hundredths) or time-based (uses ms)
-			isCLS := strings.Contains(strings.ToLower(k), "cumulative_layout_shift")
-
-			// Extract good threshold (upper bound of FAST bucket)
-			if v.Distributions[0].Max > 0 {
-				goodThreshold := float64(v.Distributions[0].Max)
-				if isCLS {
-					goodThreshold = goodThreshold / 100.0 // Convert hundredths to decimal
-				} else {
-					goodThreshold = goodThreshold / 1000.0 // Convert ms to seconds
-				}
-
-				metricSuffix := "duration_seconds"
-				if isCLS {
-					metricSuffix = "" // CLS is unitless
-				}
-
-				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc(fqname(prefix, "metrics", name, "threshold", metricSuffix), "Core Web Vitals threshold for "+strings.Replace(name, "_", " ", -1), []string{"threshold"}, constLables),
-					prometheus.GaugeValue,
-					goodThreshold,
-					"good")
-			}
-
-			// Extract poor threshold (upper bound of AVERAGE bucket)
-			if v.Distributions[1].Max > 0 {
-				poorThreshold := float64(v.Distributions[1].Max)
-				if isCLS {
-					poorThreshold = poorThreshold / 100.0
-				} else {
-					poorThreshold = poorThreshold / 1000.0
-				}
-
-				metricSuffix := "duration_seconds"
-				if isCLS {
-					metricSuffix = ""
-				}
-
-				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc(fqname(prefix, "metrics", name, "threshold", metricSuffix), "Core Web Vitals threshold for "+strings.Replace(name, "_", " ", -1), []string{"threshold"}, constLables),
-					prometheus.GaugeValue,
-					poorThreshold,
-					"poor")
-			}
-		}
 	}
-
 }
 
 func collectLighthouseResults(prefix string, cats []string, lhr *pagespeedonline.LighthouseResultV5, constLabels prometheus.Labels, ch chan<- prometheus.Metric) {

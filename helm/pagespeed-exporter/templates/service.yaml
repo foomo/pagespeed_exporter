@@ -1,17 +1,28 @@
 apiVersion: v1
 kind: Service
-apiVersion: v1
-kind: Service
 metadata:
   name: {{ include "pagespeed-exporter.fullname" . }}
   labels:
-    {{- include "pagespeed-exporter.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "pagespeed-exporter.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    {{- if .Values.prometheus.scrape }}
+    prometheus.io/scrape: "true"
+    prometheus.io/port: {{ .Values.service.targetPort | quote }}
+    prometheus.io/path: {{ .Values.prometheus.path | quote }}
+    {{- end }}
+    {{- with .Values.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.targetPort }}
+      targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
-      name: http
+      name: metrics
   selector:
-    {{- include "pagespeed-exporter.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "pagespeed-exporter.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
